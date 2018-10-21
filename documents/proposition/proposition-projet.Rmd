@@ -1,0 +1,30 @@
+---
+title: "Proposition de projet"
+subtitle: "GIF-7005: Introduction à l'apprentissage machine"
+date: "26 octobre 2018"
+author: "Équipe 10: Stéphane Caron, Philippe Blais, Philippe Blouin-Leclerc, Samuel Lévesque et William Bourget"
+output: pdf_document
+bibliography: bibliography.bib
+---
+
+# Description du projet
+
+Dans le cadre du projet à réaliser dans le cours GIF-7005, notre équipe avons choisi la problématique proposée par l'entreprise Coveo. Le problème consiste à bâtir un modèle d'apprentissage supervisée qui, à partir d'une nouvelle recherche, retourne un ensemble d'au plus 5 documents pertinents à un utilisateur donné. 
+
+# Jeu de données
+
+Pour entraîner notre modèle, nous aurons accès à des données portant sur différentes recherches réalisées par des utilisateurs. Nous pourrons donc utiliser certaines informations générales sur l'utilisateur et sur la recherche effectuée, par exemple:
+
+- le langague
+- le pays de provenance
+- la ville 
+- la requête effectuée
+- ...
+
+De plus, nous pourrons accès aux clics effectués par l'utilisateur en réponse à sa recherche. Ces clics nous donnent l'information sur les documents choisis par l'utilisateur. Cela sera d'ailleurs ce que nous tenterons de modéliser avec notre algorithme d'apprentissage.
+
+# Méthodologie anticipée
+
+Nous pensons utilisé l'approche proposée par [@hastie01statisticallearning] sur ...
+
+# Références
