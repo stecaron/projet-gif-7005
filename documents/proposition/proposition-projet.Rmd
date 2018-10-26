@@ -9,13 +9,13 @@ bibliography: bibliography.bib
 
 # Description du projet
 
-Dans le cadre du projet à réaliser dans le cours GIF-7005, notre équipe avons choisi la problématique proposée par l'entreprise Coveo. Le problème consiste à bâtir un modèle d'apprentissage supervisée qui, à partir d'une nouvelle recherche, retourne un ensemble d'au plus 5 documents pertinents à un utilisateur donné. 
+Dans le cadre du projet à réaliser dans le cours GIF-7005, notre équipe avons choisi la problématique proposée par l'entreprise Coveo. Le problème consiste à bâtir un modèle d'apprentissage supervisé qui, à partir d'une nouvelle recherche, retourne un ensemble d'au plus 5 documents pertinents à un utilisateur donné. 
 
 # Jeu de données
 
 Pour entraîner notre modèle, nous aurons accès à des données portant sur différentes recherches réalisées par des utilisateurs. Nous pourrons donc utiliser certaines informations générales sur l'utilisateur et sur la recherche effectuée, par exemple:
 
-- le langague
+- le langue de la recherche
 - le pays de provenance
 - la ville 
 - la requête effectuée
@@ -25,9 +25,9 @@ De plus, nous aurons accès aux clics effectués par l'utilisateur en réponse �
 
 # Méthodologie anticipée
 
-Pour bâtir notre modèle, nous prévoyons utiliser deux types de méthodes. Dans la première phase, nous pensions commencé par utiliser un modèle simple et intuitif dans un contexte de classification. Pour ce faire, nous pensions utiliser un algorithme commme celui des *k-PPV* [@Alpaydin:2010:IML:1734076]. Dans la seconde phase, nous prévoyons tester des réseaux de neurones [@Goodfellow-et-al-2016], qui sont d'ailleurs vraiment populaires pour les systèmes de recommendation.
+Pour bâtir notre modèle, nous prévoyons utiliser deux types de méthodes. Dans la première phase, nous pensions commencer par utiliser un modèle simple et intuitif dans un contexte de classification. Pour ce faire, nous pensions utiliser un algorithme commme celui des *k-PPV* [@Alpaydin:2010:IML:1734076]. Dans la seconde phase, nous prévoyons tester des réseaux de neurones [@Goodfellow-et-al-2016], qui sont d'ailleurs très populaires pour les systèmes de recommendation.
 
-Les méthodes citées plus haut sont des méthodes supervisées. Cela veut dire que le modèle apprend à prédire une réponse connue. Nous aimerions aussi tester si des méthodes non-supervisées pourraient nous aider à entraîner des modèles supersivées par la suite. En d'autres mots, nous allons considérer la possibilité de regrouper les documents dans des groupes de documents similaires et utiliser cette information comme variable dans notre modèle supervisée.
+Les méthodes citées plus haut sont des méthodes supervisées. Cela veut dire que le modèle apprend à prédire une réponse connue. Nous aimerions aussi tester si des méthodes non-supervisées pourraient nous aider à entraîner des modèles supersivés par la suite. En d'autres mots, nous allons considérer la possibilité de regrouper les caractéristiques des recherches dans des groupes similaires et utiliser cette information comme variable dans notre modèle supervisé.
 
 Finalement, nous prévoyons aussi utiliser le concept de *word2vec* pour trouver des représentations vectorielles des mots qui feront partis de nos documents et des titres de nos documents.
 
