@@ -21,10 +21,14 @@ Pour entraîner notre modèle, nous aurons accès à des données portant sur di
 - la requête effectuée
 - ...
 
-De plus, nous pourrons accès aux clics effectués par l'utilisateur en réponse à sa recherche. Ces clics nous donnent l'information sur les documents choisis par l'utilisateur. Cela sera d'ailleurs ce que nous tenterons de modéliser avec notre algorithme d'apprentissage.
+De plus, nous aurons accès aux clics effectués par l'utilisateur en réponse à sa recherche. Ces clics nous donnent l'information sur les documents choisis par celui-ci. Cela sera d'ailleurs ce que nous tenterons de modéliser avec notre algorithme d'apprentissage.
 
 # Méthodologie anticipée
 
-Nous pensons utilisé l'approche proposée par [@hastie01statisticallearning] sur ...
+Pour bâtir notre modèle, nous prévoyons utiliser deux types de méthodes. Dans la première phase, nous pensions commencé par utiliser un modèle simple et intuitif dans un contexte de classification. Pour ce faire, nous pensions utiliser un algorithme commme celui des *k-PPV* [@Alpaydin:2010:IML:1734076]. Dans la seconde phase, nous prévoyons tester des réseaux de neurones [@Goodfellow-et-al-2016], qui sont d'ailleurs vraiment populaires pour les systèmes de recommendation.
+
+Les méthodes citées plus haut sont des méthodes supervisées. Cela veut dire que le modèle apprend à prédire une réponse connue. Nous aimerions aussi tester si des méthodes non-supervisées pourraient nous aider à entraîner des modèles supersivées par la suite. En d'autres mots, nous allons considérer la possibilité de regrouper les documents dans des groupes de documents similaires et utiliser cette information comme variable dans notre modèle supervisée.
+
+Finalement, nous prévoyons aussi utiliser le concept de *word2vec* pour trouver des représentations vectorielles des mots qui feront partis de nos documents et des titres de nos documents.
 
 # Références
