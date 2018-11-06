@@ -19,7 +19,7 @@ Pour entraîner notre modèle, nous aurons accès à des données portant sur di
 - le pays de provenance
 - la ville 
 - la requête effectuée
-- ...
+- ....
 
 De plus, nous aurons accès aux clics effectués par l'utilisateur en réponse à sa recherche. Ces clics nous donnent l'information sur les documents choisis par celui-ci. Cela sera d'ailleurs ce que nous tenterons de modéliser avec notre algorithme d'apprentissage.
 
