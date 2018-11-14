@@ -27,7 +27,7 @@ De plus, nous aurons accès aux clics effectués par l'utilisateur en réponse �
 
 Pour bâtir notre modèle, nous prévoyons utiliser deux types de méthodes. Dans la première phase, nous pensions commencer par utiliser un modèle simple et intuitif dans un contexte de classification. Pour ce faire, nous pensions utiliser un algorithme commme celui des *k-PPV* [@Alpaydin:2010:IML:1734076]. 
 
-Dans la seconde phase, nous prévoyons tester des réseaux de neurones [@Goodfellow-et-al-2016], qui sont d'ailleurs très populaires pour les systèmes de recommendation.
+Dans la seconde phase, nous prévoyons tester des réseaux de neurones [@Goodfellow-et-al-2016], qui sont d'ailleurs très populaires pour les systèmes de recommendation. Un modèle de *deep learning* plus avancé qui pourrait être adapté à notre problèmatique est celui de *DeepRank* mentionné dans [@Deep_rank].
 
 Les méthodes citées plus haut sont des méthodes supervisées. Cela veut dire que le modèle apprend à prédire une réponse connue. Nous aimerions aussi tester si des méthodes non-supervisées pourraient nous aider à entraîner des modèles supersivés par la suite. En d'autres mots, nous allons considérer la possibilité de regrouper les caractéristiques des recherches dans des groupes similaires et utiliser cette information comme variable dans notre modèle supervisé.
 
@@ -50,7 +50,5 @@ Voici un plan par étapes que nous souhaitons suivre pour la réalisation de ce 
 + Utiliser les mêmes caractéristiques des requêtes, mais sans celles des documents pour optimiser des modèles de classification multi-classes tels *Naive Bayes* et les *SVM* avec un nombre de classes égal au nombre de documents. Tester plusieurs hyperparamètres pour optimiser les hyperparamètres.
 
 + Utiliser ces mêmes caractéristiques dans un modèle neuronal avec un nombre de sorties égal au nombre total de documents et utiliser les caractéristiques d'entrée comme couche d'entrée. Tester plusieurs combinaisons de fonctions d'activation et de nombre de neurones/couches pour obtenir une solution satisfaisante.
-
-+ Tester des modèles de *deep learning* plus avancés en s'inspirant du modèle *DeepRank* mentionné dans [@Deep_rank].
 
 # Références
