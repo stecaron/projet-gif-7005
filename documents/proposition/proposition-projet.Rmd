@@ -51,4 +51,6 @@ Voici un plan par étapes que nous souhaitons suivre pour la réalisation de ce 
 
 + Utiliser ces mêmes caractéristiques dans un modèle neuronal avec un nombre de sorties égal au nombre total de documents et utiliser les caractéristiques d'entrée comme couche d'entrée. Tester plusieurs combinaisons de fonctions d'activation et de nombre de neurones/couches pour obtenir une solution satisfaisante.
 
++ Tester des modèles de *deep learning* plus avancés en s'inspirant du modèle *DeepRank* mentionné dans [@Deep_rank].
+
 # Références
