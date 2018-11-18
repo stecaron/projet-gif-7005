@@ -7,17 +7,21 @@ Notes
 # Étapes #
 Nettoyage des données
     - Définir les champs qu’on veut tester en premier, et ceux qui vont suivre.
-    - Nettoyage des données
     - Jointure de données (clicks avec les searches)
 
 Traitements des données
     - Définir un pipeline (les combinaisons de traitements qu’on veut faire)
     - Utiliser seulement les searches qui ont des clicks
-    - Utiliser les searches qui n’ont pas de clicks, mais qui ont été faites par un même user, et voir si 
-    on pourrait pas associer les clicks des searches semblables aux searches « orpheline » (sans clicks)
-    - Attribution d’un document_id à une classe : du unsupervised avec les document_title, et les regrouper en classe
-    - Normaliser les query
+    - Attribuer un document_id à une classe : du non supervisé avec les document_title, afin de regrouper 
+    en classe de documents
+    - Normaliser les query (fréquence, ou présence, tfidf)
     - Déterminer les modèles que l’on veut tester
+    
+    Phase 2 - Relation entre les searches
+    - Utiliser les searches qui n’ont pas de clicks, mais qui ont été faites par un même user, et voir si 
+    on pourrait pas associer les clicks des searches semblables aux searches « orpheline » (sans clicks).
+    Autrement dit on veut rendre utiles les searches qui n'ont pas de clicks.
 
 Gestion du projet
     - Attribution des tâches aux membres du projet
+    - Calendrier des tâches
