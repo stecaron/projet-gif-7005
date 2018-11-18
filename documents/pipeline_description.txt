@@ -1,0 +1,31 @@
+# Description pipeline #
+
+Ce document sert à lister les différentes étapes de traitement et d'estimations que nous souhaitons intégrer à notre pipeline.
+
+Pipeline de pré-traitement:
+    - Choix des raw features
+        + Seulement les queries/labels
+        + Queries et autres champs/labels
+        + Queries, autres champs et champs créés à partir de l'historique de l'utilisateur/labels ***
+    - Normalisation du texte de la query
+        + Aucune
+        + Lemmatisation
+        + Stemming
+    - Vectorisation du texte de la query
+        + Fréquence
+        + Présence
+        + TF-IDF
+
+Pipeline de labels (y):
+    - Regroupement des documents à prédire
+        + Une classe par document ID
+        + Regroupement des documents par clustering pour créer des classes de document (réduction du nombre de classes possibles)
+
+Pipeline de classifieurs:
+    - K-PPV
+    - SVM
+    - Régression logistique
+    - Réseau de neurones
+
+Optimisation des hyperparamètres:
+    - Voir devoir 3 pour paramètres à optimiser pour chacun des modèles
