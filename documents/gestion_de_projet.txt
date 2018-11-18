@@ -1,0 +1,22 @@
+*** Gestion projet coveo ***
+
+Notes
+    - Commencer par le plus simple! Si on veut pondre quelque chose!
+    - Relations entre les query : vraiment plus en phase II
+
+# Étapes #
+Nettoyage des données
+    - Définir les champs qu’on veut tester en premier, et ceux qui vont suivre.
+    - Nettoyage des données
+    - Jointure de données (clicks avec les searches)
+
+Traitements des données
+    - Définir un pipeline (les combinaisons de traitements qu’on veut faire)
+    - Les searches qui n’ont pas de clicks
+    - Les searches qui n’ont pas de clicks, mais pour un même user, et voir si d’autres searches semblables ont des clicks
+    - Attribution d’un document_id à une classe : du unsupervised avec les document_title, et les regrouper en classe
+    - Normaliser les query
+    - Déterminer les modèles que l’on veut tester
+
+Gestion du projet
+    - Attribution des tâches aux membres du projet
