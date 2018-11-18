@@ -17,6 +17,7 @@ Pipeline de pré-traitement:
         + Fréquence
         + Présence
         + TF-IDF
+        + Word2Vec
 
     - Réduction de la dimensionnalité
         + Aucune
