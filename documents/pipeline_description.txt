@@ -7,14 +7,24 @@ Pipeline de pré-traitement:
         + Seulement les queries/labels
         + Queries et autres champs/labels
         + Queries, autres champs et champs créés à partir de l'historique de l'utilisateur/labels ***
+
     - Normalisation du texte de la query
         + Aucune
         + Lemmatisation
         + Stemming
+
     - Vectorisation du texte de la query
         + Fréquence
         + Présence
         + TF-IDF
+
+    - Réduction de la dimensionnalité
+        + Aucune
+        + ACP
+
+    - Normalisation des features
+        + Aucune
+        + Minmax_scale
 
 Pipeline de labels (y):
     - Regroupement des documents à prédire
@@ -25,7 +35,10 @@ Pipeline de classifieurs:
     - K-PPV
     - SVM
     - Régression logistique
-    - Réseau de neurones
+    - Réseau de neurones ***
 
 Optimisation des hyperparamètres:
     - Voir devoir 3 pour paramètres à optimiser pour chacun des modèles
+
+
+Les éléments *** ne seront faits que lorsque le reste sera livré
