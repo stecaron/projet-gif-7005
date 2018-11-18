@@ -8,6 +8,10 @@ Pipeline de pré-traitement:
         + Queries et autres champs/labels
         + Queries, autres champs et champs créés à partir de l'historique de l'utilisateur/labels ***
 
+    - Filtre des mots
+        + Aucun
+        + Filtre des mots outils
+
     - Normalisation du texte de la query
         + Aucune
         + Lemmatisation
