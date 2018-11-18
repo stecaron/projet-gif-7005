@@ -12,8 +12,9 @@ Nettoyage des données
 
 Traitements des données
     - Définir un pipeline (les combinaisons de traitements qu’on veut faire)
-    - Les searches qui n’ont pas de clicks
-    - Les searches qui n’ont pas de clicks, mais pour un même user, et voir si d’autres searches semblables ont des clicks
+    - Utiliser seulement les searches qui ont des clicks
+    - Utiliser les searches qui n’ont pas de clicks, mais qui ont été faites par un même user, et voir si 
+    on pourrait pas associer les clicks des searches semblables aux searches « orpheline » (sans clicks)
     - Attribution d’un document_id à une classe : du unsupervised avec les document_title, et les regrouper en classe
     - Normaliser les query
     - Déterminer les modèles que l’on veut tester
