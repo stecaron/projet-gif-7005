@@ -1,6 +1,57 @@
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 from word_to_remove_factory import WordsToRemoveFactory
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import CountVectorizer
+
+
+class FilterColumns(BaseEstimator, TransformerMixin):
+    def __init__(self, filter_group):
+        if filter_group not in ["query_only"]:
+            raise TypeError("{} is not a valid filter_group".format(filter_group))
+
+        self.filter_group = filter_group
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if self.filter_group == "query_only":
+            X = X[["query_expression"]]
+
+        return X
+
+
+class TokenizeQuery(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X = word_tokenize(X[["query_expression"]])
+
+        return X
+
+
+class VectorizeQuery(BaseEstimator, TransformerMixin):
+    def __init__(self, vectorize_method):
+        if vectorize_method not in ["count"]:
+            raise TypeError("{} is not a valid vectorize method".format(vectorize_method))
+
+        self.vectorize_method = vectorize_method
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if self.vectorize_method == "count":
+            X = CountVectorizer(X)
+
+        return X
+
+#################################
 
 
 class CurrentModel(BaseEstimator):
