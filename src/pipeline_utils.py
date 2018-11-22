@@ -3,23 +3,43 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from word_to_remove_factory import WordsToRemoveFactory
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
+import pandas as pd
+
+#Ancienne version pour le main original
+# class FilterColumns(BaseEstimator, TransformerMixin):
+#     def __init__(self, filter_group):
+#
+#         if filter_group not in ["query_only"]:
+#             raise TypeError("{} is not a valid filter_group".format(filter_group))
+#
+#         self.filter_group = filter_group
+#
+#     def fit(self, X, y=None):
+#         return self
+#
+#     def transform(self, X):
+#         if self.filter_group == "query_only":
+#             X = X[["query_expression"]]
+#
+#         return X
 
 
 class FilterColumns(BaseEstimator, TransformerMixin):
+    '''
+    filter_group : list des noms de columns du data frame qu'on veut conserver
+    '''
     def __init__(self, filter_group):
-        if filter_group not in ["query_only"]:
-            raise TypeError("{} is not a valid filter_group".format(filter_group))
-
         self.filter_group = filter_group
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        if self.filter_group == "query_only":
-            X = X[["query_expression"]]
+
+        X = X[self.filter_group]
 
         return X
+
 
 
 class TokenizeQuery(BaseEstimator, TransformerMixin):
@@ -39,25 +59,77 @@ class TokenizeQuery(BaseEstimator, TransformerMixin):
         return X_trans
 
 
+# class VectorizeQuery(BaseEstimator, TransformerMixin):
+#     def __init__(self, vectorize_method):
+#         if vectorize_method not in ["count"]:
+#             raise TypeError("{} is not a valid vectorize method".format(vectorize_method))
+#
+#         self.vectorize_method = vectorize_method
+#
+#     def fit(self, X, y=None):
+#         return self
+#
+#     def transform(self, X):
+#         if self.vectorize_method == "count":
+#             vect = CountVectorizer()
+#             queries = X.values.tolist()
+#
+#             vectorized_queries = vect.fit_transform(queries)
+#
+#         return vectorized_queries.toarray()
+
+
 class VectorizeQuery(BaseEstimator, TransformerMixin):
-    def __init__(self, vectorize_method):
-        if vectorize_method not in ["count"]:
-            raise TypeError("{} is not a valid vectorize method".format(vectorize_method))
+    '''
+    Prend le data frame qui contient au moins la colonne query_expression.
+    Transforme chacun des mots en une colone de mot comptable avec selon une technique(vectorize_method)
+    '''
+    def __init__(self, vectorize_method,freq_min=1):
 
         self.vectorize_method = vectorize_method
+        self.freq_min =freq_min
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
         if self.vectorize_method == "count":
-            vect = CountVectorizer()
-            queries = X.values.tolist()
-            vectorized_queries = vect.fit_transform(queries)
+            vect = CountVectorizer(min_df=self.freq_min)
+        if self.vectorize_method == "binary count":
+            vect = CountVectorizer(min_df=self.freq_min,binary=True)
 
-        return vectorized_queries
 
-#################################
+
+
+        queries = X["query_expression"].values.tolist()
+        vectorized_queries = vect.fit_transform(queries)
+
+        df_vectorized_queries=pd.DataFrame(vectorized_queries.toarray(),columns=vect.get_feature_names())
+
+        X=X.drop(columns=["query_expression"])
+
+        return pd.concat([X,df_vectorized_queries],axis=1)
+
+class TransformCategoricalVar(BaseEstimator,TransformerMixin):
+    '''
+    Prends notre data frame X et converti nos variables catégoriques en numériques:
+    user_country --> user_country_Canada, user_country_India,..... (0 ou 1)
+    '''
+    def __init__(self):
+        pass
+
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X=pd.get_dummies(X)
+
+        return X
+
+
+
+########################################################################################################################
 
 
 class CurrentModel(BaseEstimator):
