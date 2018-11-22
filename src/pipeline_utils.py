@@ -62,26 +62,26 @@ class RemoveWords(BaseEstimator):
         return self.word_remover.transform(x=x)
 
 
-
-class NormaliseWords(BaseEstimator, TransformerMixin):
-    def __init__(self, normalise_type):
-        self.normalise_type = normalise_type
-
-        if self.normalise_type == "lemmatize" or "stemming" or "none":
-            pass
-        else:
-            raise TypeError("{} is not lemmatize, stemming or none".format(self.normalise_type))
-
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, x):
-        if self.normalise_type == "none":
-            x = np.array(list(x))
-        elif self.normalise_type == "lemmatize":
-            x = map(lambda r: ' '.join([wordnet.WordNetLemmatizer().lemmatize(i.lower()) for i in r.split()]), x)
-            x = np.array(list(x))
-        elif self.normalise_type == "stemming":
-            x = map(lambda r: ' '.join([porter.PorterStemmer().stem(i.lower()) for i in r.split()]), x)
-            x = np.array(list(x))
-        return x
+#
+# class NormaliseWords(BaseEstimator, TransformerMixin):
+#     def __init__(self, normalise_type):
+#         self.normalise_type = normalise_type
+#
+#         if self.normalise_type == "lemmatize" or "stemming" or "none":
+#             pass
+#         else:
+#             raise TypeError("{} is not lemmatize, stemming or none".format(self.normalise_type))
+#
+#     def fit(self, x, y=None):
+#         return self
+#
+#     def transform(self, x):
+#         if self.normalise_type == "none":
+#             x = np.array(list(x))
+#         elif self.normalise_type == "lemmatize":
+#             x = map(lambda r: ' '.join([wordnet.WordNetLemmatizer().lemmatize(i.lower()) for i in r.split()]), x)
+#             x = np.array(list(x))
+#         elif self.normalise_type == "stemming":
+#             x = map(lambda r: ' '.join([porter.PorterStemmer().stem(i.lower()) for i in r.split()]), x)
+#             x = np.array(list(x))
+#         return x
