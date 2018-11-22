@@ -23,16 +23,20 @@ class FilterColumns(BaseEstimator, TransformerMixin):
 
 
 class TokenizeQuery(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        pass
+    def __init__(self, tokenize_method):
+        if tokenize_method not in ["word_tokenize"]:
+            raise TypeError("{} is not a valid tokenizing method".format(tokenize_method))
+
+        self.tokenize_method = tokenize_method
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        X = word_tokenize(X[["query_expression"]])
+        if self.tokenize_method == "word_tokenize":
+            X_trans = X.apply(lambda row: word_tokenize(row['query_expression']), axis=1)
 
-        return X
+        return X_trans
 
 
 class VectorizeQuery(BaseEstimator, TransformerMixin):
@@ -47,9 +51,11 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         if self.vectorize_method == "count":
-            X = CountVectorizer(X)
+            vect = CountVectorizer()
+            queries = X.values.tolist()
+            vectorized_queries = vect.fit_transform(queries)
 
-        return X
+        return vectorized_queries
 
 #################################
 

@@ -16,7 +16,7 @@ def main():
                                ("transform_data",
                                     pipeline.FeatureUnion([
                                         ("transformed_query",
-                                            pipeline.Pipeline([("tokenize_query", TokenizeQuery()),
+                                            pipeline.Pipeline([("tokenize_query", TokenizeQuery(tokenize_method="word_tokenize")),
                                                                ("vectorize_query", VectorizeQuery(vectorize_method="count"))]))
                                     ])),
                                ("classifier", KNeighborsClassifier())])
@@ -25,8 +25,7 @@ def main():
     obj_labels_encoder = LabelEncoder()
     y = obj_labels_encoder.fit_transform(labels)
 
-    model.fit(df_searches_clicks[["query_expression"]], y)
-
+    model.fit(df_searches_clicks, y)
 
 
 if __name__ == "__main__":
