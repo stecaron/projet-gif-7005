@@ -96,21 +96,18 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
         if self.vectorize_method == "count":
             vect = CountVectorizer(min_df=self.freq_min)
         if self.vectorize_method == "binary count":
-            vect = CountVectorizer(min_df=self.freq_min,binary=True)
-
-
-
+            vect = CountVectorizer(min_df=self.freq_min, binary=True)
 
         queries = X["query_expression"].values.tolist()
         vectorized_queries = vect.fit_transform(queries)
 
-        df_vectorized_queries=pd.DataFrame(vectorized_queries.toarray(),columns=vect.get_feature_names())
+        df_vectorized_queries=pd.DataFrame(vectorized_queries.toarray(), columns=vect.get_feature_names())
 
-        X=X.drop(columns=["query_expression"])
+        X = X.drop(columns=["query_expression"])
 
-        return pd.concat([X,df_vectorized_queries],axis=1)
+        return pd.concat([X, df_vectorized_queries], axis=1)
 
-class TransformCategoricalVar(BaseEstimator,TransformerMixin):
+class TransformCategoricalVar(BaseEstimator, TransformerMixin):
     '''
     Prends notre data frame X et converti nos variables catégoriques en numériques:
     user_country --> user_country_Canada, user_country_India,..... (0 ou 1)
@@ -123,7 +120,7 @@ class TransformCategoricalVar(BaseEstimator,TransformerMixin):
         return self
 
     def transform(self, X):
-        X=pd.get_dummies(X)
+        X = pd.get_dummies(X)
 
         return X
 
