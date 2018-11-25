@@ -47,18 +47,21 @@ def main2():
 
 
     #POUR TEST BIDON
-    mini_y= y[:100]
-    mini_df=df_searches_clicks[:100]
+    mini_y= y[:1000]
+    mini_df=df_searches_clicks[:1000]
 
+    mini_y_test = y[1001:2000]
+    mini_df_test = df_searches_clicks[1001:2000]
 
 
 
     #Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline=pipeline.Pipeline([
 
-        ("data_extract", FilterColumns(filter_group=["query_expression","search_nresults","user_language","user_country"])),
-        ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)), #Tokenise deja je crois
-        ("categorical_var_to_num",TransformCategoricalVar())
+        #("data_extract", FilterColumns(filter_group=["query_expression","search_nresults","user_language","user_country"])),
+        ("data_extract", FilterColumns(filter_group=["query_expression","search_nresults"])),
+        ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)) #Tokenise deja je crois
+        #("categorical_var_to_num",TransformCategoricalVar()) #Bug pour l'instant
 
      ])
 
@@ -70,51 +73,49 @@ def main2():
     ])
 
 
-
-
     #TEST BIDON
-    X_essai_transformation=transformation_pipeline.transform(mini_df)
+    X_essai_transformation=transformation_pipeline.fit_transform(mini_df)
+    print(X_essai_transformation)
+
+    X_test = transformation_pipeline.transform(mini_df_test)
+    print(X_test)
+
+
 
     final_pipe.fit(mini_df,mini_y)
-    y_pred=final_pipe.predict(mini_df)
-    #print(y_pred)
-
-    #print(final_pipe.classes_)
     print(final_pipe.score(mini_df,mini_y))
+    print("Score Coveo:", custom_scorer(final_pipe, mini_df, mini_y))
 
-    print("Score Coveo:",custom_scorer(final_pipe,mini_df,mini_y))
+    y_pred_deja_vu=final_pipe.predict(mini_df)
 
-    print(final_pipe.get_params().keys())
+    y_pred=final_pipe.predict(mini_df_test)
+    print(final_pipe.score(mini_df_test,mini_y_test))
+    print("Score Coveo essaie de test:", custom_scorer(final_pipe, mini_df_test, mini_y_test))
 
 
-
+    #print(final_pipe.get_params().keys())
 
     ####################################################################################################################
-    #Optimisation avec Grid search MARCHE PAS
+    #Optimisation avec Grid search
     ####################################################################################################################
-
-   #MARCHE PAS
-    optimise=0
+    optimise=1
     if optimise==1:
 
         grille_finale={
             "Transformer__vectorize_query__freq_min": [1,2],
-            "Transformer__vectorize_query__vectorize_method": ["count"],
+            "Transformer__vectorize_query__vectorize_method": ["count","tf-idf"],
             "Classifier__penalty":["l1","l2"]
 
         }
         grid_search=GridSearchCV(final_pipe,grille_finale,scoring=custom_scorer,cv=2)
         grid_search.fit(mini_df,mini_y)
+        print("\n Grid search sur pipeline")
+        print(grid_search.best_params_)
+        print(grid_search.best_score_)
 
 
 
 
-        #Test bidon fonctionne
-        params={"penalty":("l1","l2")}
-        clf=GridSearchCV(LogisticRegression(),params,scoring=custom_scorer)
-        clf.fit(X_essai_transformation,mini_y)
-        print(clf.best_params_)
-        print(clf.score(X_essai_transformation,mini_y))
 
 if __name__ == "__main__":
     #main()

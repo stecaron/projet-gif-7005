@@ -2,7 +2,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 from word_to_remove_factory import WordsToRemoveFactory
 from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 import pandas as pd
 
 #Ancienne version pour le main original
@@ -27,6 +27,7 @@ import pandas as pd
 class FilterColumns(BaseEstimator, TransformerMixin):
     '''
     filter_group : list des noms de columns du data frame qu'on veut conserver
+
     '''
     def __init__(self, filter_group):
         self.filter_group = filter_group
@@ -79,41 +80,90 @@ class TokenizeQuery(BaseEstimator, TransformerMixin):
 #         return vectorized_queries.toarray()
 
 
+# class VectorizeQuery(BaseEstimator, TransformerMixin):
+#     '''
+#     Prend le data frame qui contient au moins la colonne query_expression.
+#     Transforme chacun des mots en une colone de mot comptable avec selon une technique(vectorize_method)
+#     '''
+#     def __init__(self, vectorize_method,freq_min=1):
+#
+#         self.vectorize_method = vectorize_method
+#         self.freq_min =freq_min
+#
+#     def fit(self, X, y=None):
+#
+#         return self
+#
+#     def transform(self, X):
+#         if self.vectorize_method == "count":
+#             vect = CountVectorizer(min_df=self.freq_min)
+#         if self.vectorize_method == "binary count":
+#             vect = CountVectorizer(min_df=self.freq_min,binary=True)
+#
+#
+#
+#
+#         queries = X["query_expression"].values.tolist()
+#         vectorized_queries = vect.fit_transform(queries)
+#
+#         df_vectorized_queries=pd.DataFrame(vectorized_queries.toarray(),columns=vect.get_feature_names())
+#
+#         X=X.drop(columns=["query_expression"])
+#
+#         return pd.concat([X,df_vectorized_queries],axis=1)
+
 class VectorizeQuery(BaseEstimator, TransformerMixin):
     '''
     Prend le data frame qui contient au moins la colonne query_expression.
     Transforme chacun des mots en une colone de mot comptable avec selon une technique(vectorize_method)
     '''
-    def __init__(self, vectorize_method,freq_min=1):
+
+    def __init__(self, vectorize_method, freq_min=1):
 
         self.vectorize_method = vectorize_method
-        self.freq_min =freq_min
+        self.freq_min = freq_min
 
     def fit(self, X, y=None):
+        self.update_class_vectorizer()
+        queries=X["query_expression"].values.tolist()
+        self.vect.fit(queries)
         return self
 
-    def transform(self, X):
+
+
+    def update_class_vectorizer(self):
+
         if self.vectorize_method == "count":
-            vect = CountVectorizer(min_df=self.freq_min)
+            self.vect = CountVectorizer(min_df=self.freq_min)
         if self.vectorize_method == "binary count":
-            vect = CountVectorizer(min_df=self.freq_min,binary=True)
+            self.vect = CountVectorizer(min_df=self.freq_min, binary=True)
+        if self.vectorize_method == "tf-idf":
+            self.vect = TfidfVectorizer(min_df=self.freq_min)
 
 
+    def transform(self, X):
 
 
         queries = X["query_expression"].values.tolist()
-        vectorized_queries = vect.fit_transform(queries)
+        vectorized_queries = self.vect.transform(queries)
 
-        df_vectorized_queries=pd.DataFrame(vectorized_queries.toarray(),columns=vect.get_feature_names())
+        df_vectorized_queries = pd.DataFrame(vectorized_queries.toarray(), columns=self.vect.get_feature_names())
 
-        X=X.drop(columns=["query_expression"])
+        X=X.reset_index(drop=True)
+        X = X.drop(columns=["query_expression"])
 
-        return pd.concat([X,df_vectorized_queries],axis=1)
+        df_avec_nouvelles_valeurs=pd.concat([X, df_vectorized_queries], axis=1)
+
+        return df_avec_nouvelles_valeurs
+
+
 
 class TransformCategoricalVar(BaseEstimator,TransformerMixin):
     '''
     Prends notre data frame X et converti nos variables catégoriques en numériques:
     user_country --> user_country_Canada, user_country_India,..... (0 ou 1)
+
+    BUG A RÉGLER: faire en sorte que le fit conserve seulement les variables vue en fit
     '''
     def __init__(self):
         pass
