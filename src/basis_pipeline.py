@@ -1,122 +1,145 @@
 import pandas as pd
-from import_data import import_raw_data
+from import_data import import_raw_data,sophisticated_merge
 from sklearn import pipeline
 from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import GridSearchCV
 from Score_thats_it import custom_scorer
 import numpy as np
 
+from grid_search_utility import Make_All_Grid_Search_Models
 
+#################################################
+#Config
+#################################################
+config={"Basic data merge":True,
+        "Sophisticated data merge":False,#À faire éventuellement, description dans A faire.txt
+        "Show test bidon":True,#À enlever éventuellement
+        "Create all grid searchs":False,
+        "Show me the best grid":True,
+        "Show me all the grids":False
+        }
+
+
+
+#Utiliser skleanr v0.2
 def main():
+
+
     raw_data = import_raw_data()
+    if config["Basic data merge"]:
+        #Data
+        df_searches_clicks_train = pd.merge(raw_data["coveo_searches_train"],
+                                      raw_data["coveo_clicks_train"],
+                                      on="search_id")
 
-    df_searches_clicks = pd.merge(raw_data["coveo_searches_train"],
-                                  raw_data["coveo_clicks_train"],
-                                  on="search_id")
 
-    model = pipeline.Pipeline([("data_extract", FilterColumns(filter_group="query_only")),
-                               ("transform_data",
-                                    pipeline.FeatureUnion([
-                                        ("transformed_query",
-                                            pipeline.Pipeline([("tokenize_query", TokenizeQuery(tokenize_method="word_tokenize")),
-                                                               ("vectorize_query", VectorizeQuery(vectorize_method="count"))]))
-                                    ])),
-                               ("classifier", KNeighborsClassifier())])
+    if config["Sophisticated data merge"]:
+        df_searches_clicks_train=sophisticated_merge(raw_data["coveo_searches_train"],raw_data["coveo_clicks_train"])
 
-    labels = df_searches_clicks["document_id"].tolist()
-    obj_labels_encoder = LabelEncoder()
-    y = obj_labels_encoder.fit_transform(labels)
 
-    model.fit(df_searches_clicks, y)
 
-def main2():
-
-    #Data
-    raw_data = import_raw_data()
-    df_searches_clicks = pd.merge(raw_data["coveo_searches_train"],
-                                  raw_data["coveo_clicks_train"],
-                                  on="search_id")
     # Labels
-    labels = df_searches_clicks["document_id"].tolist()
+    labels = df_searches_clicks_train["document_id"].tolist()
     obj_labels_encoder = LabelEncoder()
     y = obj_labels_encoder.fit_transform(labels)
 
 
-    #POUR TEST BIDON
-    mini_y= y[:1000]
-    mini_df=df_searches_clicks[:1000]
+    # POUR TEST, À RETIRER
+    mini_y = y[:1000]
+    mini_df = df_searches_clicks_train[:1000]
 
     mini_y_test = y[1001:2000]
-    mini_df_test = df_searches_clicks[1001:2000]
+    mini_df_test = df_searches_clicks_train[1001:2000]
 
 
 
     #Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline=pipeline.Pipeline([
 
-        #("data_extract", FilterColumns(filter_group=["query_expression","search_nresults","user_language","user_country"])),
-        ("data_extract", FilterColumns(filter_group=["query_expression","search_nresults"])),
-        ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)) #Tokenise deja je crois
-        #("categorical_var_to_num",TransformCategoricalVar()) #Bug pour l'instant
+        ("data_extract", FilterColumns(filter_group=["query_expression","search_nresults","user_country","user_language"])),
+        ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
+        ("categorical_var_to_num", TransformCategoricalVar())
 
      ])
 
+    if config["Show test bidon"]:
+        #TEST BIDON
 
-    #Combine le transformer de data frame et le classifier
-    final_pipe=pipeline.Pipeline([
-        ("Transformer",transformation_pipeline),
-        ("Classifier",LogisticRegression())
-    ])
+        X_essai_transformation=transformation_pipeline.fit_transform(mini_df)
+        print(X_essai_transformation)
 
-
-    #TEST BIDON
-    X_essai_transformation=transformation_pipeline.fit_transform(mini_df)
-    print(X_essai_transformation)
-
-    X_test = transformation_pipeline.transform(mini_df_test)
-    print(X_test)
+        X_test = transformation_pipeline.transform(mini_df_test)
+        print(X_test)
 
 
-
-    final_pipe.fit(mini_df,mini_y)
-    print(final_pipe.score(mini_df,mini_y))
-    print("Score Coveo:", custom_scorer(final_pipe, mini_df, mini_y))
-
-    y_pred_deja_vu=final_pipe.predict(mini_df)
-
-    y_pred=final_pipe.predict(mini_df_test)
-    print(final_pipe.score(mini_df_test,mini_y_test))
-    print("Score Coveo essaie de test:", custom_scorer(final_pipe, mini_df_test, mini_y_test))
-
-
-    #print(final_pipe.get_params().keys())
 
     ####################################################################################################################
-    #Optimisation avec Grid search
+    # Optimisation avec Grid search
     ####################################################################################################################
-    optimise=1
-    if optimise==1:
 
-        grille_finale={
-            "Transformer__vectorize_query__freq_min": [1,2],
-            "Transformer__vectorize_query__vectorize_method": ["count","tf-idf"],
-            "Classifier__penalty":["l1","l2"]
+    grille_transformer={
+        "Transformer__vectorize_query__freq_min": [1,2],
+        "Transformer__vectorize_query__vectorize_method": ["count","tf-idf"]
+    }
+    estimators={
+        "MLP": MLPClassifier(),
+        #"XGB":GradientBoostingClassifier(),
+        "KNN":KNeighborsClassifier()
+    }
+    grille_estimators={
+        "MLP":{"Classifier__activation": ["relu", "tanh"]},
+        #"XGB":{"Classifier__n_estimators":[10,32]},
+        "KNN":{"Classifier__n_neighbors":[1,3,10],"Classifier__weights":["uniform","distance"]}
 
-        }
-        grid_search=GridSearchCV(final_pipe,grille_finale,scoring=custom_scorer,cv=2)
-        grid_search.fit(mini_df,mini_y)
-        print("\n Grid search sur pipeline")
+    }
+
+
+    Make_grid=Make_All_Grid_Search_Models(transformation_pipeline,grille_transformer,estimators,grille_estimators)
+
+    if config["Create all grid searchs"]:
+        Make_grid.test_best_grid_search(mini_df,mini_y)
+
+    if config["Show me all the grids"]:
+        Make_grid.show_me_all_grids()
+
+    if config["Show me the best grid"]:
+        grid_search=Make_grid.return_best_grid_search()
+        print("\nBest grid search:")
         print(grid_search.best_params_)
-        print(grid_search.best_score_)
+        print("Score en validation:",grid_search.best_score_)
 
 
 
+    if config["Show test bidon"]:
+        optimise_bidon=0
+        if optimise_bidon==1:
+            # Combine le transformer de data frame et le classifier
+            final_pipe = pipeline.Pipeline([
+                ("Transformer", transformation_pipeline),
+                ("Classifier", MLPClassifier())
+            ])
+
+            grille_finale={
+                "Transformer__vectorize_query__freq_min": [1,2],
+                "Transformer__vectorize_query__vectorize_method": ["count","tf-idf"],
+                "Classifier__activation":["relu","tanh"]
+
+            }
+            grid_search=GridSearchCV(final_pipe,grille_finale,scoring=custom_scorer,cv=2)
+            grid_search.fit(mini_df,mini_y)
+
+            #Print
+            print("\n Liste paramètres et scores")
+            print("\n Grid search sur pipeline best:")
+            print(grid_search.best_params_)
+            print(grid_search.best_score_)
 
 
 if __name__ == "__main__":
-    #main()
-    main2()
+    main()
