@@ -28,5 +28,8 @@ def custom_scorer(estimator,X,y):
     return np.mean(np.apply_along_axis(max,axis=1,arr=mat_bool))
 
 
+#TODO faire l'exportation csv
+def predict_top5_and_export_csv(estimator,X):
+    pass
 
 

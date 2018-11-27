@@ -19,7 +19,7 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #################################################
 config={"Basic data merge":True,
         "Sophisticated data merge":False,#À faire éventuellement, description dans A faire.txt
-        "Show test bidon":True,#À enlever éventuellement
+        "Show test bidon":False,#À enlever éventuellement
         "Create all grid searchs":False,
         "Show me the best grid":True,
         "Show me all the grids":False
@@ -38,25 +38,23 @@ def main():
                                       raw_data["coveo_clicks_train"],
                                       on="search_id")
 
+        df_searches_clicks_valid=pd.merge(raw_data["coveo_searches_valid"],
+                                      raw_data["coveo_clicks_valid"],
+                                      on="search_id")
+
 
     if config["Sophisticated data merge"]:
         df_searches_clicks_train=sophisticated_merge(raw_data["coveo_searches_train"],raw_data["coveo_clicks_train"])
 
 
-
     # Labels
-    labels = df_searches_clicks_train["document_id"].tolist()
     obj_labels_encoder = LabelEncoder()
-    y = obj_labels_encoder.fit_transform(labels)
+    labels_train = df_searches_clicks_train["document_id"].tolist()
+    labels_test = df_searches_clicks_valid["document_id"].tolist()
+    obj_labels_encoder.fit(labels_train+labels_test)
 
-
-    # POUR TEST, À RETIRER
-    mini_y = y[:1000]
-    mini_df = df_searches_clicks_train[:1000]
-
-    mini_y_test = y[1001:2000]
-    mini_df_test = df_searches_clicks_train[1001:2000]
-
+    y_train = obj_labels_encoder.transform(labels_train)
+    y_valid=obj_labels_encoder.transform(labels_test)
 
 
     #Pipeline de toutes les transformations qu'on fait, en ordre
@@ -70,6 +68,12 @@ def main():
 
     if config["Show test bidon"]:
         #TEST BIDON
+        # POUR TEST, À RETIRER
+        mini_y = y_train[:1000]
+        mini_df = df_searches_clicks_train[:1000]
+
+        mini_y_test = y_train[1001:2000]
+        mini_df_test = df_searches_clicks_train[1001:2000]
 
         X_essai_transformation=transformation_pipeline.fit_transform(mini_df)
         print(X_essai_transformation)
@@ -95,7 +99,7 @@ def main():
     grille_estimators={
         "MLP":{"Classifier__activation": ["relu", "tanh"]},
         #"XGB":{"Classifier__n_estimators":[10,32]},
-        "KNN":{"Classifier__n_neighbors":[1,3,10],"Classifier__weights":["uniform","distance"]}
+        "KNN":{"Classifier__n_neighbors":[1,3,10,15],"Classifier__weights":["uniform","distance"]}
 
     }
 
@@ -103,7 +107,7 @@ def main():
     Make_grid=Make_All_Grid_Search_Models(transformation_pipeline,grille_transformer,estimators,grille_estimators)
 
     if config["Create all grid searchs"]:
-        Make_grid.test_best_grid_search(mini_df,mini_y)
+        Make_grid.test_best_grid_search(df_searches_clicks_train,y_train)
 
     if config["Show me all the grids"]:
         Make_grid.show_me_all_grids()
@@ -113,6 +117,14 @@ def main():
         print("\nBest grid search:")
         print(grid_search.best_params_)
         print("Score en validation:",grid_search.best_score_)
+
+
+
+        score_test=custom_scorer(grid_search,df_searches_clicks_valid,y_valid)
+        print("Score sur valid (utilisées comme test):",score_test)
+
+
+
 
 
 
