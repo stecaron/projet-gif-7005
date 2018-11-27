@@ -18,7 +18,6 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #Config
 #################################################
 config={"Basic data merge":True,
-        "Sophisticated data merge":False,#À faire éventuellement, description dans A faire.txt
         "Show test bidon":False,#À enlever éventuellement
         "Create all grid searchs":False,
         "Show me the best grid":True,
@@ -43,9 +42,12 @@ def main():
                                       on="search_id")
 
 
-    if config["Sophisticated data merge"]:
+    else:
         df_searches_clicks_train=sophisticated_merge(raw_data["coveo_searches_train"],raw_data["coveo_clicks_train"])
 
+        df_searches_clicks_valid=pd.merge(raw_data["coveo_searches_valid"],
+                                      raw_data["coveo_clicks_valid"],
+                                      on="search_id")
 
     # Labels
     obj_labels_encoder = LabelEncoder()

@@ -16,7 +16,7 @@ def import_raw_data():
     raw_data["coveo_searches_train"] = pd.read_csv(r"../data/coveo_searches_train.csv")
     raw_data["coveo_searches_valid"] = pd.read_csv(r"../data/coveo_searches_valid.csv")
     raw_data["coveo_searches_test"]=pd.read_csv(r"../data/coveo_searches_test.csv")
-
+    
     return raw_data
 
 
@@ -30,7 +30,22 @@ def sophisticated_merge(df_searchs,df_clicks):
     :param df_clicks:
     :return: Un data frame pandas avec toutes les colones contenus dans df_searchs et df_clicks
     '''
-    pass
+
+    # On garde seulement les clicks finals pour une search (basé sur click_datetime)
+    idx = df_clicks.groupby(['search_id'])['click_datetime'].transform(max) == df_clicks['click_datetime']
+    df_clicks = df_clicks[idx]
+    
+    # On merge les searchs sur les clicks
+    df_searches_clicks_train = pd.merge(df_searchs,
+                                        df_clicks,
+                                        on="search_id",
+                                        how='left')
+    
+    # On enleve les searchs sans clicks
+    df_searches_clicks_train = df_searches_clicks_train.dropna(subset=['click_datetime'])
+    
+    
+    return df_searches_clicks_train
 
 
 #Colonne dans search:
