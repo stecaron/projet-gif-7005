@@ -22,7 +22,7 @@ config={"Basic data merge":True,
         "Show test bidon":False,#À enlever éventuellement
         "Create all grid searchs":False,
         "Show me the best grid":True,
-        "Show me all the grids":False
+        "Show me all the grids":True
         }
 
 
@@ -55,6 +55,11 @@ def main():
 
     y_train = obj_labels_encoder.transform(labels_train)
     y_valid=obj_labels_encoder.transform(labels_test)
+
+
+    #Pour accélérer tests À RETIRER
+    df_searches_clicks_train=df_searches_clicks_train[:1000]
+    y_train=y_train[:1000]
 
 
     #Pipeline de toutes les transformations qu'on fait, en ordre
@@ -104,23 +109,23 @@ def main():
     }
 
 
+
+
     Make_grid=Make_All_Grid_Search_Models(transformation_pipeline,grille_transformer,estimators,grille_estimators)
 
     if config["Create all grid searchs"]:
         Make_grid.test_best_grid_search(df_searches_clicks_train,y_train)
 
+
     if config["Show me all the grids"]:
         Make_grid.show_me_all_grids()
 
+
     if config["Show me the best grid"]:
-        grid_search=Make_grid.return_best_grid_search()
-        print("\nBest grid search:")
-        print(grid_search.best_params_)
-        print("Score en validation:",grid_search.best_score_)
 
+        final_pipe=Make_grid.return_best_pipeline(df_searches_clicks_train,y_train)
 
-
-        score_test=custom_scorer(grid_search,df_searches_clicks_valid,y_valid)
+        score_test=custom_scorer(final_pipe,df_searches_clicks_valid,y_valid)
         print("Score sur valid (utilisées comme test):",score_test)
 
 
@@ -136,6 +141,7 @@ def main():
                 ("Transformer", transformation_pipeline),
                 ("Classifier", MLPClassifier())
             ])
+
 
             grille_finale={
                 "Transformer__vectorize_query__freq_min": [1,2],

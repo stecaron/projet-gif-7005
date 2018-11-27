@@ -7,7 +7,7 @@ import pickle
 # https://stackoverflow.com/questions/31948879/using-explict-predefined-validation-set-for-grid-search-with-sklearn
 
 
-#Je sais pas pourquoi j'ai fait une classe avec ça, c'était pas nécessaire
+
 class Make_All_Grid_Search_Models():
     def __init__(self,transformation_pipeline,transformation_grid,estimators,estimator_grid):
         '''
@@ -23,8 +23,7 @@ class Make_All_Grid_Search_Models():
 
     def test_best_grid_search(self,X,y):
         '''
-        Crée le fichier list_grid_search.p qui contient une liste de grid search pour chaque classificateur
-        :param X: data frame raw
+        Crée le fichier list_grid_search.p qui contient un dictionnaire de paramètres pour chaque classificateur
         :param y:
         :return:
         '''
@@ -40,26 +39,57 @@ class Make_All_Grid_Search_Models():
             grid_search=GridSearchCV(final_pipe,final_grid,cv=2,scoring=custom_scorer)
             grid_search.fit(X,y)
 
-            list_all_grid_search.append(grid_search)
+
+
+            scores_moyens = grid_search.cv_results_['mean_test_score']
+            list_dict_params = grid_search.cv_results_['params']
+            classifier_name=key
+
+            dict_model={"Model name":classifier_name,"list Valid scores":scores_moyens,"list Params dict":list_dict_params}
+
+
+            list_all_grid_search.append(dict_model)
 
         pickle.dump(list_all_grid_search, open("list_grid_search.p", "wb"))
 
 
 
-    def return_best_grid_search(self):
+    def return_best_pipeline(self,X,y):
         '''
-        À partir de la liste du fichier list_grid_search.p renvoit le modèle grid search avec le meilleur score
+        À partir de la liste du fichier list_grid_search.p, on prend les paramètres et on crée la pipeline avec les
+        paramètres ayant le mieux performés
         :return:
         '''
         list_all_grid_search=pickle.load( open( "list_grid_search.p", "rb" ) )
+
         best_score=0
-        for grid_search in list_all_grid_search:
-            score=grid_search.best_score_
+        for dict_model in list_all_grid_search:
+            name=dict_model["Model name"]
+            score_moyen = dict_model["list Valid scores"]
+            list_dict_params = dict_model["list Params dict"]
 
-            if score>best_score:
-                best_grid_search=grid_search
+            for score, params in zip(score_moyen, list_dict_params):
 
-        return best_grid_search
+                if score>best_score:
+                    best_score=score
+                    best_dict_model={"Model name":name,"Score valid":score,"Params dict":params}
+
+
+
+        print("\nBest model:")
+        print(best_dict_model)
+
+        final_pipe = pipeline.Pipeline([
+            ("Transformer", self.transformation_pipeline),
+            ("Classifier", self.estimators[best_dict_model["Model name"]])
+        ])
+
+
+        final_pipe.set_params(**best_dict_model["Params dict"])
+        final_pipe.fit(X,y)
+
+        return final_pipe
+
 
 
 
@@ -70,11 +100,15 @@ class Make_All_Grid_Search_Models():
         """
         list_all_grid_search = pickle.load(open("list_grid_search.p", "rb"))
 
-        for grid_search in list_all_grid_search:
-            scores_moyens=grid_search.cv_results_['mean_test_score']
-            dict_params=grid_search.cv_results_['params']
-            for score,params in zip(scores_moyens,dict_params):
-                print("Score :{} avec {}".format(score,params))
+        for dict_model in list_all_grid_search:
+            name=dict_model["Model name"]
+            score_moyen = dict_model["list Valid scores"]
+            list_dict_params = dict_model["list Params dict"]
+
+            for score,params in zip(score_moyen,list_dict_params):
+                print("Model {}, Score valid :{}, params:{}".format(name,score,params))
+
+
 
 
 
