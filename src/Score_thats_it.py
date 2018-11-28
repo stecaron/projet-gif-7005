@@ -29,7 +29,19 @@ def custom_scorer(estimator,X,y):
 
 
 #TODO faire l'exportation csv
-def predict_top5_and_export_csv(estimator,X):
+def predict_top5_and_export_csv(estimator,X,obj_label):
+
+    # On pourrait modifier ça si on utilise un clf qui n'a pas la fonction
+    proba_ordered_by_classes = estimator.predict_proba(X)
+
+    ordered_classes = estimator.classes_
+    best_proba_order = np.argsort(proba_ordered_by_classes)
+
+    best_classes = ordered_classes[best_proba_order]
+    top5_classes = best_classes[:, -5:]
+
+    #Aplliquer obj_label.inverse transform, puis en dataframe pandas avec bonne colonne, puis exportation csv
+
     pass
 
 

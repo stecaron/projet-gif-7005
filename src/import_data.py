@@ -20,29 +20,37 @@ def import_raw_data():
     return raw_data
 
 
-#TODO à faire
-def sophisticated_merge(df_searchs,df_clicks):
+
+def sophisticated_merge(df_searchs,df_clicks,merge_name):
     '''
+
     Merge les clicks au searchs en se basant sur le search_id.
     Trouver une façon intelligente d'assigner des documents_id au search qui n'ont résulté en un click
 
     :param df_searchs:
     :param df_clicks:
+    :param merge_name: (str) nom par lequel on désigne le type de merge
     :return: Un data frame pandas avec toutes les colones contenus dans df_searchs et df_clicks
     '''
 
-    # On garde seulement les clicks finals pour une search (basé sur click_datetime)
-    idx = df_clicks.groupby(['search_id'])['click_datetime'].transform(max) == df_clicks['click_datetime']
-    df_clicks = df_clicks[idx]
-    
-    # On merge les searchs sur les clicks
-    df_searches_clicks_train = pd.merge(df_searchs,
-                                        df_clicks,
-                                        on="search_id",
-                                        how='left')
-    
-    # On enleve les searchs sans clicks
-    df_searches_clicks_train = df_searches_clicks_train.dropna(subset=['click_datetime'])
+    if merge_name=="basic":
+        df_searches_clicks_train = pd.merge(df_searchs,df_clicks,on="search_id")
+
+
+    elif merge_name=="merge_steph":
+
+        # On garde seulement les clicks finals pour une search (basé sur click_datetime)
+        idx = df_clicks.groupby(['search_id'])['click_datetime'].transform(max) == df_clicks['click_datetime']
+        df_clicks = df_clicks[idx]
+
+        # On merge les searchs sur les clicks
+        df_searches_clicks_train = pd.merge(df_searchs,
+                                            df_clicks,
+                                            on="search_id",
+                                            how='left')
+
+        # On enleve les searchs sans clicks
+        df_searches_clicks_train = df_searches_clicks_train.dropna(subset=['click_datetime'])
     
     
     return df_searches_clicks_train

@@ -21,7 +21,7 @@ class Make_All_Grid_Search_Models():
         self.estimators =estimators
         self.estimator_grid =estimator_grid
 
-    def test_best_grid_search(self,X,y):
+    def test_best_grid_search(self,X,y,save_name):
         '''
         Crée le fichier list_grid_search.p qui contient un dictionnaire de paramètres pour chaque classificateur
         :param y:
@@ -50,17 +50,17 @@ class Make_All_Grid_Search_Models():
 
             list_all_grid_search.append(dict_model)
 
-        pickle.dump(list_all_grid_search, open("list_grid_search.p", "wb"))
+        pickle.dump(list_all_grid_search, open(save_name+".p", "wb"))
 
 
 
-    def return_best_pipeline(self,X,y):
+    def return_best_pipeline(self,X,y,load_name):
         '''
         À partir de la liste du fichier list_grid_search.p, on prend les paramètres et on crée la pipeline avec les
         paramètres ayant le mieux performés
         :return:
         '''
-        list_all_grid_search=pickle.load( open( "list_grid_search.p", "rb" ) )
+        list_all_grid_search=pickle.load( open( load_name+".p", "rb" ) )
 
         best_score=0
         for dict_model in list_all_grid_search:
@@ -93,12 +93,12 @@ class Make_All_Grid_Search_Models():
 
 
 
-    def show_me_all_grids(self):
+    def show_me_all_grids(self,load_name):
         """
         affiche toutes les combinaisons de paramètres et leur scores
         :return:
         """
-        list_all_grid_search = pickle.load(open("list_grid_search.p", "rb"))
+        list_all_grid_search = pickle.load(open(load_name+".p", "rb"))
 
         for dict_model in list_all_grid_search:
             name=dict_model["Model name"]

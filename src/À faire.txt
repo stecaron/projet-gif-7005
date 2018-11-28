@@ -19,6 +19,6 @@ Nice to have
         -Même chose, mais avec le search time (s'ils sont très proches)
 
 Il faudra alors ajuster le nom du fichier pickle pour faire des versions différentes selon le data frame utilisé,
-pour comparer. William s'en chargera
+pour comparer. William s'en chargera DONE
 
 2. Si extrêmement courageux : deep et unsupervised, je laisserais ça de côté pour l'instant avant d'avoir fini 1.

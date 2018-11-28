@@ -8,8 +8,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
-from Score_thats_it import custom_scorer
+from Score_thats_it import custom_scorer,predict_top5_and_export_csv
 import numpy as np
 
 from grid_search_utility import Make_All_Grid_Search_Models
@@ -17,37 +18,42 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #################################################
 #Config
 #################################################
-config={"Basic data merge":True,
-        "Show test bidon":False,#À enlever éventuellement
-        "Create all grid searchs":False,
-        "Show me the best grid":True,
-        "Show me all the grids":True
+config={
+        "Merge type": "merge_steph",
+        "Show test bidon":True,#À enlever éventuellement
+
+        "Create all grid searchs":{"Do it":False,"Save name":"merge_steph"},
+
+        "Show me all the grids":{"Do it":False,"Load name":"basic"},
+
+        "Show me the best grid":{"Do it":True,"Load name":"merge_steph"},
+        "Export csv": False #À faire
         }
 
+#Explications :
+#"Merge type" ça permet de choisir le type de merge qu'on veut dans la fonction sophisticated_merge
+
+#"Create all grid searchs" si "Do it" ==True, alors ça passe nos données dans tous les modèles et les test
+#pour finalement sauvegarder les ensembles des de paramètres ainsi que leur score dans un fichier  Load name.p
+
+# "Show me all the grids" si "Do it" ==True ça load le fichier et nous montre tous les essaies effectués
+
+#"Show me the best grid" si "Do it" ==True ça load le modèle avec les meilleur paramètes à partir des meilleurs paramètres
 
 
 #Utiliser skleanr v0.2
 def main():
 
-
     raw_data = import_raw_data()
-    if config["Basic data merge"]:
-        #Data
-        df_searches_clicks_train = pd.merge(raw_data["coveo_searches_train"],
-                                      raw_data["coveo_clicks_train"],
-                                      on="search_id")
 
-        df_searches_clicks_valid=pd.merge(raw_data["coveo_searches_valid"],
-                                      raw_data["coveo_clicks_valid"],
-                                      on="search_id")
+    df_searches_clicks_train=sophisticated_merge(raw_data["coveo_searches_train"],
+                                                 raw_data["coveo_clicks_train"],
+                                                 config["Merge type"])
 
+    df_searches_clicks_valid = pd.merge(raw_data["coveo_searches_valid"],
+                                        raw_data["coveo_clicks_valid"],
+                                        on="search_id")
 
-    else:
-        df_searches_clicks_train=sophisticated_merge(raw_data["coveo_searches_train"],raw_data["coveo_clicks_train"])
-
-        df_searches_clicks_valid=pd.merge(raw_data["coveo_searches_valid"],
-                                      raw_data["coveo_clicks_valid"],
-                                      on="search_id")
 
     # Labels
     obj_labels_encoder = LabelEncoder()
@@ -60,8 +66,8 @@ def main():
 
 
     #Pour accélérer tests À RETIRER
-    df_searches_clicks_train=df_searches_clicks_train[:1000]
-    y_train=y_train[:1000]
+    df_searches_clicks_train=df_searches_clicks_train[:2000]
+    y_train=y_train[:2000]
 
 
     #Pipeline de toutes les transformations qu'on fait, en ordre
@@ -70,7 +76,7 @@ def main():
         ("data_extract", FilterColumns(filter_group=["query_expression","search_nresults","user_country","user_language"])),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
         ("categorical_var_to_num", TransformCategoricalVar())
-
+        
      ])
 
     if config["Show test bidon"]:
@@ -115,20 +121,24 @@ def main():
 
     Make_grid=Make_All_Grid_Search_Models(transformation_pipeline,grille_transformer,estimators,grille_estimators)
 
-    if config["Create all grid searchs"]:
-        Make_grid.test_best_grid_search(df_searches_clicks_train,y_train)
+    if config["Create all grid searchs"]["Do it"]:
+        Make_grid.test_best_grid_search(df_searches_clicks_train,y_train,config["Create all grid searchs"]["Save name"])
 
 
-    if config["Show me all the grids"]:
-        Make_grid.show_me_all_grids()
+    if config["Show me all the grids"]["Do it"]:
+        Make_grid.show_me_all_grids(config["Show me all the grids"]["Load name"])
 
 
-    if config["Show me the best grid"]:
+    if config["Show me the best grid"]["Do it"]:
 
-        final_pipe=Make_grid.return_best_pipeline(df_searches_clicks_train,y_train)
+        final_pipe=Make_grid.return_best_pipeline(df_searches_clicks_train,y_train,config["Show me the best grid"]["Load name"])
 
         score_test=custom_scorer(final_pipe,df_searches_clicks_valid,y_valid)
         print("Score sur valid (utilisées comme test):",score_test)
+
+
+        if config["Export csv"]:
+            predict_top5_and_export_csv(final_pipe,raw_data["coveo_searches_test"],obj_labels_encoder)
 
 
 
