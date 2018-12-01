@@ -20,13 +20,16 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #################################################
 config={
         "Merge type": "merge_steph",
-        "Show test bidon":True,#À enlever éventuellement
+        "Show test bidon": False,#À enlever éventuellement
 
-        "Create all grid searchs":{"Do it":False,"Save name":"merge_steph"},
+        "Create all grid searchs": {"Do it": False,
+                                    "Save name": "merge_steph"},
 
-        "Show me all the grids":{"Do it":False,"Load name":"basic"},
+        "Show me all the grids": {"Do it": True,
+                                  "Load name": "basic"},
 
-        "Show me the best grid":{"Do it":True,"Load name":"merge_steph"},
+        "Show me the best grid": {"Do it": True,
+                                  "Load name": "merge_steph"},
         "Export csv": False #À faire
         }
 
@@ -46,9 +49,9 @@ def main():
 
     raw_data = import_raw_data()
 
-    df_searches_clicks_train=sophisticated_merge(raw_data["coveo_searches_train"],
-                                                 raw_data["coveo_clicks_train"],
-                                                 config["Merge type"])
+    df_searches_clicks_train = sophisticated_merge(raw_data["coveo_searches_train"],
+                                                   raw_data["coveo_clicks_train"],
+                                                   config["Merge type"])
 
     df_searches_clicks_valid = pd.merge(raw_data["coveo_searches_valid"],
                                         raw_data["coveo_clicks_valid"],
@@ -62,18 +65,21 @@ def main():
     obj_labels_encoder.fit(labels_train+labels_test)
 
     y_train = obj_labels_encoder.transform(labels_train)
-    y_valid=obj_labels_encoder.transform(labels_test)
+    y_valid = obj_labels_encoder.transform(labels_test)
 
 
     #Pour accélérer tests À RETIRER
-    df_searches_clicks_train=df_searches_clicks_train[:2000]
-    y_train=y_train[:2000]
+    df_searches_clicks_train = df_searches_clicks_train[:2000]
+    y_train = y_train[:2000]
 
 
     #Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline=pipeline.Pipeline([
 
-        ("data_extract", FilterColumns(filter_group=["query_expression","search_nresults","user_country","user_language"])),
+        ("data_extract", FilterColumns(filter_group=["query_expression",
+                                                     "search_nresults",
+                                                     "user_country",
+                                                     "user_language"])),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
         ("categorical_var_to_num", TransformCategoricalVar())
         
@@ -101,28 +107,31 @@ def main():
     ####################################################################################################################
 
     grille_transformer={
-        "Transformer__vectorize_query__freq_min": [1,2],
-        "Transformer__vectorize_query__vectorize_method": ["count","tf-idf"]
+        "Transformer__vectorize_query__freq_min": [1, 2],
+        "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"]
     }
     estimators={
         "MLP": MLPClassifier(),
         #"XGB":GradientBoostingClassifier(),
-        "KNN":KNeighborsClassifier()
+        "KNN": KNeighborsClassifier()
     }
     grille_estimators={
-        "MLP":{"Classifier__activation": ["relu", "tanh"]},
-        #"XGB":{"Classifier__n_estimators":[10,32]},
-        "KNN":{"Classifier__n_neighbors":[1,3,10,15],"Classifier__weights":["uniform","distance"]}
+        "MLP": {"Classifier__activation": ["relu", "tanh"]},
+        #"XGB": {"Classifier__n_estimators": [10, 32]},
+        "KNN": {"Classifier__n_neighbors": [1, 3, 10, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
 
 
 
 
-    Make_grid=Make_All_Grid_Search_Models(transformation_pipeline,grille_transformer,estimators,grille_estimators)
+    Make_grid = Make_All_Grid_Search_Models(transformation_pipeline,
+                                            grille_transformer,
+                                            estimators,
+                                            grille_estimators)
 
     if config["Create all grid searchs"]["Do it"]:
-        Make_grid.test_best_grid_search(df_searches_clicks_train,y_train,config["Create all grid searchs"]["Save name"])
+        Make_grid.test_best_grid_search(df_searches_clicks_train, y_train, config["Create all grid searchs"]["Save name"])
 
 
     if config["Show me all the grids"]["Do it"]:
@@ -131,14 +140,14 @@ def main():
 
     if config["Show me the best grid"]["Do it"]:
 
-        final_pipe=Make_grid.return_best_pipeline(df_searches_clicks_train,y_train,config["Show me the best grid"]["Load name"])
+        final_pipe = Make_grid.return_best_pipeline(df_searches_clicks_train, y_train, config["Show me the best grid"]["Load name"])
 
-        score_test=custom_scorer(final_pipe,df_searches_clicks_valid,y_valid)
-        print("Score sur valid (utilisées comme test):",score_test)
+        score_test=custom_scorer(final_pipe, df_searches_clicks_valid, y_valid)
+        print("Score sur valid (utilisées comme test):", score_test)
 
 
         if config["Export csv"]:
-            predict_top5_and_export_csv(final_pipe,raw_data["coveo_searches_test"],obj_labels_encoder)
+            predict_top5_and_export_csv(final_pipe, raw_data["coveo_searches_test"], obj_labels_encoder)
 
 
 
@@ -146,8 +155,8 @@ def main():
 
 
     if config["Show test bidon"]:
-        optimise_bidon=0
-        if optimise_bidon==1:
+        optimise_bidon = 0
+        if optimise_bidon == 1:
             # Combine le transformer de data frame et le classifier
             final_pipe = pipeline.Pipeline([
                 ("Transformer", transformation_pipeline),
@@ -155,14 +164,14 @@ def main():
             ])
 
 
-            grille_finale={
-                "Transformer__vectorize_query__freq_min": [1,2],
-                "Transformer__vectorize_query__vectorize_method": ["count","tf-idf"],
-                "Classifier__activation":["relu","tanh"]
+            grille_finale = {
+                "Transformer__vectorize_query__freq_min": [1, 2],
+                "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"],
+                "Classifier__activation": ["relu", "tanh"]
 
             }
-            grid_search=GridSearchCV(final_pipe,grille_finale,scoring=custom_scorer,cv=2)
-            grid_search.fit(mini_df,mini_y)
+            grid_search = GridSearchCV(final_pipe, grille_finale, scoring=custom_scorer, cv=2)
+            grid_search.fit(mini_df, mini_y)
 
             #Print
             print("\n Liste paramètres et scores")
