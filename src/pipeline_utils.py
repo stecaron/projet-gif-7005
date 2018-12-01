@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from gensim.models import Word2Vec
 
 import pandas as pd
 
@@ -42,8 +43,11 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         self.update_class_vectorizer()
-        queries=X["query_expression"].values.tolist()
-        self.vect.fit(queries)
+        queries = X["query_expression"].values.tolist()
+        if self.vectorize_method == "Word2Vec":
+            self.vect.train(queries)
+        else:
+            self.vect.fit(queries)
         return self
 
 
@@ -56,10 +60,11 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
             self.vect = CountVectorizer(min_df=self.freq_min, binary=True)
         if self.vectorize_method == "tf-idf":
             self.vect = TfidfVectorizer(min_df=self.freq_min)
+        if self.vectorize_method == "Word2Vec":
+            self.vect = Word2Vec(min_count=self.freq_min)
 
 
     def transform(self, X):
-
 
         queries = X["query_expression"].values.tolist()
         vectorized_queries = self.vect.transform(queries)

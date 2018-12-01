@@ -20,7 +20,6 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #################################################
 config = {
         "Merge type": "merge_steph",
-        "Show test bidon": False,  # À enlever éventuellement
 
         "Create all grid searchs": {"Do it": False,
                                     "Save name": "merge_steph"},
@@ -82,20 +81,6 @@ def main():
         
      ])
 
-    if config["Show test bidon"]:
-        # TEST BIDON
-        # POUR TEST, À RETIRER
-        mini_y = y_train[:1000]
-        mini_df = df_searches_clicks_train[:1000]
-
-        mini_y_test = y_train[1001:2000]
-        mini_df_test = df_searches_clicks_train[1001:2000]
-
-        X_essai_transformation = transformation_pipeline.fit_transform(mini_df)
-        print(X_essai_transformation)
-
-        X_test = transformation_pipeline.transform(mini_df_test)
-        print(X_test)
 
     ####################################################################################################################
     # Optimisation avec Grid search
@@ -103,7 +88,7 @@ def main():
 
     grille_transformer = {
         "Transformer__vectorize_query__freq_min": [1, 2],
-        "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"]
+        "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf", "binary count", "Word2Vec"]
     }
     estimators = {
         "MLP": MLPClassifier(),
@@ -112,7 +97,6 @@ def main():
     }
     grille_estimators = {
         "MLP": {"Classifier__activation": ["relu", "tanh"]},
-        # "XGB": {"Classifier__n_estimators": [10, 32]},
         "KNN": {"Classifier__n_neighbors": [1, 3, 10, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
@@ -137,30 +121,6 @@ def main():
 
         if config["Export csv"]:
             predict_top5_and_export_csv(final_pipe, raw_data["coveo_searches_test"], obj_labels_encoder)
-
-    if config["Show test bidon"]:
-        optimise_bidon = 0
-        if optimise_bidon == 1:
-            # Combine le transformer de data frame et le classifier
-            final_pipe = pipeline.Pipeline([
-                ("Transformer", transformation_pipeline),
-                ("Classifier", MLPClassifier())
-            ])
-
-            grille_finale = {
-                "Transformer__vectorize_query__freq_min": [1, 2],
-                "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"],
-                "Classifier__activation": ["relu", "tanh"]
-
-            }
-            grid_search = GridSearchCV(final_pipe, grille_finale, scoring=custom_scorer, cv=2)
-            grid_search.fit(mini_df, mini_y)
-
-            # Print
-            print("\n Liste paramètres et scores")
-            print("\n Grid search sur pipeline best:")
-            print(grid_search.best_params_)
-            print(grid_search.best_score_)
 
 
 if __name__ == "__main__":
