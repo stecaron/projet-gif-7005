@@ -7,6 +7,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from gensim.models import Word2Vec
+from nltk.stem import PorterStemmer
 
 import pandas as pd
 import numpy as np
@@ -25,6 +26,38 @@ class FilterColumns(BaseEstimator, TransformerMixin):
     def transform(self, X):
 
         X = X[self.filter_group]
+
+        return X
+
+
+class NormalizeQuery(BaseEstimator, TransformerMixin):
+    def __init__(self, normalize_method):
+        self.normalize_method = normalize_method
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if self.normalize_method == "None":
+            pass
+
+        elif self.normalize_method == "PorterStemmer":
+            ps = PorterStemmer()
+            stemmed_queries = []
+            for i, sentence in enumerate(X["query_expression"]):
+                words = word_tokenize(sentence)
+
+                stemmed_words = []
+
+                for word in words:
+                    stemmed_words.append(ps.stem(word))
+
+                stemmed_queries.append(" ".join(word for word in stemmed_words))
+
+            X.loc[:, ("query_expression")] = stemmed_queries
+
+        else:
+            raise NotImplementedError("Unknown normalize_method")
 
         return X
 

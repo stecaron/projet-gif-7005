@@ -1,7 +1,7 @@
 import pandas as pd
 from import_data import import_raw_data,sophisticated_merge
 from sklearn import pipeline
-from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar
+from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar, NormalizeQuery
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
@@ -22,13 +22,13 @@ config = {
         "Merge type": "merge_steph",
 
         "Create all grid searchs": {"Do it": True,
-                                    "Save name": "test_word2vec"},
+                                    "Save name": "Full_20181202"},
 
         "Show me all the grids": {"Do it": True,
-                                  "Load name": "test_word2vec"},
+                                  "Load name": "Full_20181202"},
 
         "Show me the best grid": {"Do it": True,
-                                  "Load name": "test_word2vec"},
+                                  "Load name": "Full_20181202"},
         "Export csv": False  # À faire
         }
 
@@ -76,6 +76,7 @@ def main():
                                                      "search_nresults",
                                                      "user_country",
                                                      "user_language"])),
+        ("normalize_query", NormalizeQuery(normalize_method="None")),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
         ("categorical_var_to_num", TransformCategoricalVar())
         
@@ -88,7 +89,9 @@ def main():
 
     grille_transformer = {
         "Transformer__vectorize_query__freq_min": [1, 2],
-        "Transformer__vectorize_query__vectorize_method": ["Word2Vec"]
+        "Transformer__normalize_query__normalize_method": ["PorterStemmer", "None"],
+        "Transformer__vectorize_query__vectorize_method": ["count", "binary count", "Word2Vec", "tf-idf"]
+
     }
     estimators = {
         "MLP": MLPClassifier(),
