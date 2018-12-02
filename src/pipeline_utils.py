@@ -6,9 +6,10 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-from gensim.models import Word2Vec, Sent2Vec
+from gensim.models import Word2Vec
 
 import pandas as pd
+import numpy as np
 
 
 class FilterColumns(BaseEstimator, TransformerMixin):
@@ -42,8 +43,13 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         self.update_class_vectorizer()
         queries = X["query_expression"].values.tolist()
+        # Traitement particulier pour Word2Vec
         if self.vectorize_method == "Word2Vec":
-            self.vect = Sent2Vec(queries, min_count=self.freq_min)
+            tokenized_queries = [word_tokenize(i) for i in queries]
+            tokenized_queries = create_unk_tokens(tokenized_queries)
+
+            self.vect = Word2Vec(tokenized_queries, min_count=self.freq_min)
+
         else:
             self.vect.fit(queries)
         return self
@@ -62,9 +68,26 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
     def transform(self, X):
 
         queries = X["query_expression"].values.tolist()
-        vectorized_queries = self.vect.transform(queries)
+        if self.vectorize_method == "Word2Vec":
+            vectorized_queries = []
+            tokenized_queries = [word_tokenize(i) for i in queries]
+            for sentence in tokenized_queries:
+                word_vecs = []
+                for word in sentence:
+                    try:
+                        word_vecs.append(self.vect[word])
 
-        df_vectorized_queries = pd.DataFrame(vectorized_queries.toarray(), columns=self.vect.get_feature_names())
+                    except KeyError:
+                        word_vecs.append(self.vect["<UNK>"])
+
+                vectorized_queries.append(np.mean(np.array(word_vecs), 0))
+
+            df_vectorized_queries = pd.DataFrame(vectorized_queries)
+
+        else:
+            vectorized_queries = self.vect.transform(queries)
+
+            df_vectorized_queries = pd.DataFrame(vectorized_queries.toarray(), columns=self.vect.get_feature_names())
 
         X = X.reset_index(drop=True)
         X = X.drop(columns=["query_expression"])
@@ -191,5 +214,20 @@ class RemoveWords(BaseEstimator):
 
     def transform(self, x):
         return self.word_remover.transform(x=x)
+
+
+def create_unk_tokens(tokenized_sentences):
+    transformed_tokens = []
+    list_of_known_words = []
+    for sentence in tokenized_sentences:
+        for i, word in enumerate(sentence):
+            if word not in list_of_known_words:
+                sentence[i] = "<UNK>"
+                list_of_known_words.append(word)
+
+        transformed_tokens.append(sentence)
+
+    return transformed_tokens
+
 
 

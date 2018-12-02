@@ -97,7 +97,7 @@ def main():
     }
     grille_estimators = {
         "MLP": {"Classifier__activation": ["relu", "tanh"]},
-        "KNN": {"Classifier__n_neighbors": [1, 3, 10, 15], "Classifier__weights": ["uniform", "distance"]}
+        "KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
 
