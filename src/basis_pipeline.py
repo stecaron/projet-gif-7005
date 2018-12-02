@@ -21,14 +21,14 @@ from grid_search_utility import Make_All_Grid_Search_Models
 config = {
         "Merge type": "merge_steph",
 
-        "Create all grid searchs": {"Do it": False,
-                                    "Save name": "merge_steph"},
+        "Create all grid searchs": {"Do it": True,
+                                    "Save name": "test_word2vec"},
 
         "Show me all the grids": {"Do it": True,
-                                  "Load name": "basic"},
+                                  "Load name": "test_word2vec"},
 
         "Show me the best grid": {"Do it": True,
-                                  "Load name": "merge_steph"},
+                                  "Load name": "test_word2vec"},
         "Export csv": False  # À faire
         }
 
@@ -66,8 +66,8 @@ def main():
     y_valid = obj_labels_encoder.transform(labels_test)
 
     # Pour accélérer tests À RETIRER
-    # df_searches_clicks_train = df_searches_clicks_train[:2000]
-    # y_train = y_train[:2000]
+    df_searches_clicks_train = df_searches_clicks_train[:2000]
+    y_train = y_train[:2000]
 
     # Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline = pipeline.Pipeline([
@@ -88,7 +88,7 @@ def main():
 
     grille_transformer = {
         "Transformer__vectorize_query__freq_min": [1, 2],
-        "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf", "binary count", "Word2Vec"]
+        "Transformer__vectorize_query__vectorize_method": ["Word2Vec"]
     }
     estimators = {
         "MLP": MLPClassifier(),

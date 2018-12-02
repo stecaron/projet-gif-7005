@@ -6,17 +6,15 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-from gensim.models import Word2Vec
+from gensim.models import Word2Vec, Sent2Vec
 
 import pandas as pd
 
 
-
 class FilterColumns(BaseEstimator, TransformerMixin):
-    '''
+    """
     filter_group : liste des noms de columns du data frame qu'on veut conserver
-
-    '''
+    """
     def __init__(self, filter_group):
         self.filter_group = filter_group
 
@@ -31,10 +29,10 @@ class FilterColumns(BaseEstimator, TransformerMixin):
 
 
 class VectorizeQuery(BaseEstimator, TransformerMixin):
-    '''
+    """
     Prend le data frame qui contient au moins la colonne query_expression.
     Transforme chacun des mots en une colone de mot comptable avec selon une technique(vectorize_method)
-    '''
+    """
 
     def __init__(self, vectorize_method, freq_min=1):
 
@@ -45,12 +43,10 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
         self.update_class_vectorizer()
         queries = X["query_expression"].values.tolist()
         if self.vectorize_method == "Word2Vec":
-            self.vect.train(queries)
+            self.vect = Sent2Vec(queries, min_count=self.freq_min)
         else:
             self.vect.fit(queries)
         return self
-
-
 
     def update_class_vectorizer(self):
 
@@ -63,7 +59,6 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
         if self.vectorize_method == "Word2Vec":
             self.vect = Word2Vec(min_count=self.freq_min)
 
-
     def transform(self, X):
 
         queries = X["query_expression"].values.tolist()
@@ -71,35 +66,32 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
 
         df_vectorized_queries = pd.DataFrame(vectorized_queries.toarray(), columns=self.vect.get_feature_names())
 
-        X=X.reset_index(drop=True)
+        X = X.reset_index(drop=True)
         X = X.drop(columns=["query_expression"])
 
-        df_avec_nouvelles_valeurs=pd.concat([X, df_vectorized_queries], axis=1)
+        df_avec_nouvelles_valeurs = pd.concat([X, df_vectorized_queries], axis=1)
 
         return df_avec_nouvelles_valeurs
 
 
-class TransformCategoricalVar(BaseEstimator,TransformerMixin):
-    '''
+class TransformCategoricalVar(BaseEstimator, TransformerMixin):
+    """
     Prends notre data frame X et converti nos variables catégoriques en numériques:
     user_country --> x0_Canada, x0_India,..... (0 ou 1)
 
     Transorme les NAN en "inconnu"
-
-    '''
+    """
     def __init__(self):
         pass
 
-
     def fit(self, X, y=None):
-        self.hot_encoder=OneHotEncoder(handle_unknown="ignore")
-        X_cat=X.select_dtypes(include="object")
-        X_cat=X_cat.fillna("inconnu")
+        self.hot_encoder = OneHotEncoder(handle_unknown="ignore")
+        X_cat = X.select_dtypes(include="object")
+        X_cat = X_cat.fillna("inconnu")
 
         self.hot_encoder.fit(X_cat)
-        #Pour noms des colonnes
-        self.column_names=self.hot_encoder.get_feature_names()
-
+        # Pour noms des colonnes
+        self.column_names = self.hot_encoder.get_feature_names()
 
         return self
 
@@ -107,16 +99,15 @@ class TransformCategoricalVar(BaseEstimator,TransformerMixin):
         X = X.reset_index(drop=True)
         X_cat = X.select_dtypes(include="object")
         X_cat = X_cat.fillna("inconnu")
-        array_cat=self.hot_encoder.transform(X_cat).toarray()
+        array_cat = self.hot_encoder.transform(X_cat).toarray()
 
-        data_frame_cat=pd.DataFrame(array_cat,columns=self.column_names)
+        data_frame_cat = pd.DataFrame(array_cat, columns=self.column_names)
 
-        X_sans_cat=X.select_dtypes(exclude="object")
+        X_sans_cat = X.select_dtypes(exclude="object")
 
         df_avec_nouvelles_valeurs = pd.concat([X_sans_cat, data_frame_cat], axis=1)
 
         return df_avec_nouvelles_valeurs
-
 
 
 ########################################################################################################################
@@ -138,10 +129,9 @@ class TokenizeQuery(BaseEstimator, TransformerMixin):
 
         return X_trans
 
-
-
 # A essayer ?
-#http://www.davidsbatista.net/blog/2018/02/23/model_optimization/
+# http://www.davidsbatista.net/blog/2018/02/23/model_optimization/
+
 
 class CurrentModel(BaseEstimator):
     def __init__(self, model_name):
@@ -159,15 +149,14 @@ class CurrentModel(BaseEstimator):
         if self.model_name == "knn":
             self.current_model_class = KNeighborsClassifier()
 
-        if self.current_name=="MLP":
-            self.current_model_class=MLPClassifier()
+        if self.current_name == "MLP":
+            self.current_model_class = MLPClassifier()
 
         else:
             raise TypeError("{} is not a selectable model".format(self.model_name))
 
     def score(self, x, y=None):
         return self.current_model_class.score(x, y=y)
-
 
 
 class AddOtherFeatures(BaseEstimator, TransformerMixin):
@@ -182,7 +171,6 @@ class AddOtherFeatures(BaseEstimator, TransformerMixin):
             raise NotImplementedError()
         else:
             return None
-
 
 
 class RemoveWords(BaseEstimator):
