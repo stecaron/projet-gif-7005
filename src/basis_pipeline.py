@@ -12,6 +12,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
 from Score_thats_it import custom_scorer,predict_top5_and_export_csv
 import numpy as np
+from sklearn.impute import  SimpleImputer
 
 from grid_search_utility import Make_All_Grid_Search_Models
 
@@ -47,6 +48,7 @@ config = {
 # Utiliser skleanr v0.2
 def main():
 
+    # DATA
     raw_data = import_raw_data()
 
     df_searches_clicks_train = sophisticated_merge(raw_data["coveo_searches_train"],
@@ -57,7 +59,7 @@ def main():
                                         raw_data["coveo_clicks_valid"],
                                         on="search_id")
 
-    # Labels
+    # LABELS
     obj_labels_encoder = LabelEncoder()
     labels_train = df_searches_clicks_train["document_id"].tolist()
     labels_test = df_searches_clicks_valid["document_id"].tolist()
@@ -81,7 +83,8 @@ def main():
                                                      "user_country",
                                                      "user_language"])),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
-        ("categorical_var_to_num", TransformCategoricalVar())
+        ("categorical_var_to_num", TransformCategoricalVar()),
+        ("Fill_missing", SimpleImputer(strategy="mean"))
 
      ])
 
@@ -145,6 +148,7 @@ def main():
 
 
     if config["Show test bidon"]:
+        #Example d'une pipeline détaillé
         optimise_bidon = 0
         if optimise_bidon == 1:
             # Combine le transformer de data frame et le classifier

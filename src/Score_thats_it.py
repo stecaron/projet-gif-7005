@@ -34,11 +34,10 @@ def custom_scorer(estimator,X,y):
 #TODO trouver la source du problème. TROUVÉ !
 def predict_top5_and_export_csv(estimator,X,obj_label):
 
-    #TESTING
+    #TESTING À RETIRER
     pipeline_transformation_seulement=pipeline.Pipeline(estimator.steps[:-1])#Pogne la pipeline, sans la classification
     print(pipeline_transformation_seulement.transform(X)) #La transformation du data set complet se fait bien
-
-    X=X[:440] #plus haute valeur bug, car manque données dans search_nresults
+    #X=X[:440] #plus haute valeur bug, car manque données dans search_nresults
     #FIN TESTING
 
     proba_ordered_by_classes = estimator.predict_proba(X)
