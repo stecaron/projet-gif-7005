@@ -19,18 +19,18 @@ from grid_search_utility import Make_All_Grid_Search_Models
 # Config
 #################################################
 config = {
-        "Merge type": "merge_steph",
+        "Merge type": "basic",
         "Show test bidon": False,  # À enlever éventuellement
 
         "Create all grid searchs": {"Do it": False,
-                                    "Save name": "merge_steph"},
+                                    "Save name": "basic"},
 
-        "Show me all the grids": {"Do it": True,
+        "Show me all the grids": {"Do it": False,
                                   "Load name": "basic"},
 
         "Show me the best grid": {"Do it": True,
-                                  "Load name": "merge_steph"},
-        "Export csv": False  # À faire
+                                  "Load name": "basic"},
+        "Export csv": True
         }
 
 # Explications :
@@ -66,9 +66,12 @@ def main():
     y_train = obj_labels_encoder.transform(labels_train)
     y_valid = obj_labels_encoder.transform(labels_test)
 
+
+
+
     # Pour accélérer tests À RETIRER
-    # df_searches_clicks_train = df_searches_clicks_train[:2000]
-    # y_train = y_train[:2000]
+    df_searches_clicks_train = df_searches_clicks_train[:2000]
+    y_train = y_train[:2000]
 
     # Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline = pipeline.Pipeline([
@@ -79,7 +82,7 @@ def main():
                                                      "user_language"])),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
         ("categorical_var_to_num", TransformCategoricalVar())
-        
+
      ])
 
     if config["Show test bidon"]:
@@ -136,7 +139,10 @@ def main():
         print("Score sur valid (utilisées comme test):", score_test)
 
         if config["Export csv"]:
+
             predict_top5_and_export_csv(final_pipe, raw_data["coveo_searches_test"], obj_labels_encoder)
+
+
 
     if config["Show test bidon"]:
         optimise_bidon = 0

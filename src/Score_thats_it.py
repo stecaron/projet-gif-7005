@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+from sklearn import pipeline
+
 
 def custom_scorer(estimator,X,y):
     """
@@ -28,10 +31,16 @@ def custom_scorer(estimator,X,y):
     return np.mean(np.apply_along_axis(max,axis=1,arr=mat_bool))
 
 
-#TODO faire l'exportation csv
+#TODO trouver la source du problème. TROUVÉ !
 def predict_top5_and_export_csv(estimator,X,obj_label):
 
-    # On pourrait modifier ça si on utilise un clf qui n'a pas la fonction
+    #TESTING
+    pipeline_transformation_seulement=pipeline.Pipeline(estimator.steps[:-1])#Pogne la pipeline, sans la classification
+    print(pipeline_transformation_seulement.transform(X)) #La transformation du data set complet se fait bien
+
+    X=X[:440] #plus haute valeur bug, car manque données dans search_nresults
+    #FIN TESTING
+
     proba_ordered_by_classes = estimator.predict_proba(X)
 
     ordered_classes = estimator.classes_
@@ -40,8 +49,20 @@ def predict_top5_and_export_csv(estimator,X,obj_label):
     best_classes = ordered_classes[best_proba_order]
     top5_classes = best_classes[:, -5:]
 
-    #Aplliquer obj_label.inverse transform, puis en dataframe pandas avec bonne colonne, puis exportation csv
 
-    pass
+    #Convertion labels et exportation
+    data={}
+    data["search_id"]=X["search_id"]
+    j=1
+    for i in range(4,-1,-1):
+        test=top5_classes[:,i]
+        data["doc{}".format(j)]=obj_label.inverse_transform(test)
+        j+=1
+
+
+    frame=pd.DataFrame(data)
+    frame.to_csv("predictions.csv", sep=',', encoding='utf-8',index=False)
+    print("Fichier exporté sous le nom: predictions.csv")
+
 
 

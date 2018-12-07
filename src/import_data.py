@@ -52,7 +52,8 @@ def sophisticated_merge(df_searchs,df_clicks,merge_name):
         # On enleve les searchs sans clicks
         df_searches_clicks_train = df_searches_clicks_train.dropna(subset=['click_datetime'])
     
-    
+
+
     return df_searches_clicks_train
 
 
