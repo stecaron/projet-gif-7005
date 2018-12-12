@@ -31,12 +31,12 @@ def custom_scorer(estimator,X,y):
     return np.mean(np.apply_along_axis(max,axis=1,arr=mat_bool))
 
 
-#TODO trouver la source du problème. TROUVÉ !
+
 def predict_top5_and_export_csv(estimator,X,obj_label):
 
     #TESTING À RETIRER
-    pipeline_transformation_seulement=pipeline.Pipeline(estimator.steps[:-1])#Pogne la pipeline, sans la classification
-    print(pipeline_transformation_seulement.transform(X)) #La transformation du data set complet se fait bien
+    #pipeline_transformation_seulement=pipeline.Pipeline(estimator.steps[:-1])#Pogne la pipeline, sans la classification
+    #print(pipeline_transformation_seulement.transform(X)) #La transformation du data set complet se fait bien
     #X=X[:440] #plus haute valeur bug, car manque données dans search_nresults
     #FIN TESTING
 

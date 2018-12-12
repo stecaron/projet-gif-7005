@@ -26,7 +26,7 @@ config = {
         "Create all grid searchs": {"Do it": False,
                                     "Save name": "basic"},
 
-        "Show me all the grids": {"Do it": False,
+        "Show me all the grids": {"Do it": True,
                                   "Load name": "basic"},
 
         "Show me the best grid": {"Do it": True,
@@ -44,6 +44,7 @@ config = {
 
 # "Show me the best grid" si "Do it" ==True ça load le modèle avec les meilleur paramètes à partir des meilleurs paramètres
 
+# "Export csv" permet d'exporter les prédictions du meilleur modèle en version csv
 
 # Utiliser skleanr v0.2
 def main():
@@ -117,7 +118,7 @@ def main():
         "KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"]},
+        "MLP": {"Classifier__activation": ["relu", "tanh"],"Classifier__hidden_layer_sizes":[(100,),(100,100)]},
         # "XGB": {"Classifier__n_estimators": [10, 32]},
         "KNN": {"Classifier__n_neighbors": [1, 3, 10, 15], "Classifier__weights": ["uniform", "distance"]}
 
