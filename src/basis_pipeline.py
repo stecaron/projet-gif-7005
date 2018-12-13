@@ -68,16 +68,12 @@ def main():
     y_train = obj_labels_encoder.transform(labels_train)
     y_valid = obj_labels_encoder.transform(labels_test)
 
-
-
-
     # Pour accélérer tests À RETIRER
     df_searches_clicks_train = df_searches_clicks_train[:2000]
     y_train = y_train[:2000]
 
     # Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline = pipeline.Pipeline([
-
         ("data_extract", FilterColumns(filter_group=["query_expression",
                                                      "search_nresults",
                                                      "user_country",
@@ -86,7 +82,6 @@ def main():
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
         ("categorical_var_to_num", TransformCategoricalVar()),
         ("Fill_missing", SimpleImputer(strategy="mean"))
-
      ])
 
 
@@ -149,7 +144,6 @@ def main():
                 "Transformer__vectorize_query__freq_min": [1, 2],
                 "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"],
                 "Classifier__activation": ["relu", "tanh"]
-
             }
             grid_search = GridSearchCV(final_pipe, grille_finale, scoring=custom_scorer, cv=2)
             grid_search.fit(mini_df, mini_y)
