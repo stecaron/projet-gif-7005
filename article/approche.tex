@@ -2,3 +2,22 @@ Ici, on présente les grandes lignes conceptuelles qui ont basé notre travail.
 On souhaite entre autres présenter et référencer les modèles les plus importants qui ont été utilisés dans notre modèle.
 
 On discute aussi des concepts du document recomendation et pourquoi on s'intéresse surtout à certaines variables (pourquoi beaucoup de travail sur les queries, utilisation de techniques du traitement de la langue naturelle, etc.)
+
+-- Début du vrai texte
+
+Selon le livre \emph{Introduction to Information Retrieval} de \cite{schutze2008introduction}, une approche standard en recherche d'information est de se servir du contenu des documents pour créer un jeu d'attributs pour chaque document disponible. 
+On fait ensuite la même chose avec les recherches qui ont mené à ces documents et on peut par la suite se définir une mesure de similarité entre une recherche et un document de telle sorte que la similarité soit la plus grande dans les cas où le document était pertinent pour l'utilisateur.
+
+Si nos attributs sont bien construits et qu'on définit bien notre mesure de similarité, on peut ainsi facilement recommander une liste des documents les plus pertinents pour une nouvelle requête en appliquant nos traitements sur la requête et en calculant la similarité avec chacun des documents.
+
+
+Malheureusement, n'ayant pas accès au contenu des documents à recommander, nous avons décidé d'attaquer le problème comme une situation d'apprentissage supervisé ou les classes sont l'ensemble des documents possibles et en construisant des attributs autours de nos requêtes.
+
+Puisque nous pensons que la majorité de l'information utile à nos prédictions se trouve dans la requête textuelle, notre approche consiste à tester plusieurs techniques de vectorisation de texte pour transformer nos requêtes textuelles en information numérique utilisable pour entraîner des modèles d'apprentissage automatique.
+
+Également, afin de bien capter les requêtes utilisant des mots de sens commun, nous souhaitons utiliser les plongements de mots, décrits dans le chapitre 6.8 du libre \emph{Speech and Language Processing} de \cite{jurafsky2014speech}.
+
+On souhaite par la suite utiliser ces représentations numériques de nos requêtes pour comparer différents modèles d'apprentisasge automatique et optimiser leurs hyperparamètres pour augmenter le pouvoir prédictif de notre modèle.
+
+Finalement, puiqu'on s'attaque ici à un problème de classification à un très grand nombre de classes, nous souhaitons faire de l'apprentissage non-supervisé sur les attributs de nos documents pour regrouper certains d'eux et réduire le nombre de classes possibles. On utiliserait par la suite ces classes aggrégées pour entraîner un modèle de classification qui retournerait plutôt un groupe de documents duquel on choisirait les 5 plus pertinents.
+
