@@ -1,0 +1,24 @@
+########################################################################################################################
+Must
+########################################################################################################################
+1. faire le predict du top 5 des docs les plus probables et retourner un data frame transformé en csv sous la forme
+que demande Coveo (on peut s'inspirer de custom_scorer dans fichier Score_thats_it) William s'en charge
+
+2. Enlever les éléments bidons de test et utiliser les vrais données pour les modèles
+
+
+
+########################################################################################################################
+Nice to have
+########################################################################################################################
+1. Au lieu de ne pas utiliser les searchs qui n'ont pas de click, trouver une façon intelligente de leur assigner des clicks
+    (Une petite équipe pourrait s'occuper de ça)
+    Idées:
+        -Avec les visit id, si on voit qu'un gars a un search sans click, mais qu'il en fait une autre semblable après
+        qui obtient un click. Alors assigner ce click à la search sans click
+        -Même chose, mais avec le search time (s'ils sont très proches)
+
+Il faudra alors ajuster le nom du fichier pickle pour faire des versions différentes selon le data frame utilisé,
+pour comparer. William s'en chargera DONE
+
+2. Si extrêmement courageux : deep et unsupervised, je laisserais ça de côté pour l'instant avant d'avoir fini 1.

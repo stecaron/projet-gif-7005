@@ -1,36 +1,7 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+from sklearn import pipeline
 
-
-#Ne pas utiliser
-def score_from_data_frame(df_pred,df_real):
-
-    """
-    Calcul le score d'évaluation que covéo utilise
-    :param df_pred: data_frame pandas sous la forme search_id, doc1, doc2, doc3, doc3, doc4, doc5
-    :param df_real: data_frame pandas sous la form search_id doc
-    :return: score float
-    """
-
-    df_searches_clicks = pd.merge(df_pred, df_real, on="search_id")
-
-
-
-    df_searches_clicks["is in 1"] =np.where(df_searches_clicks["doc"].isin(df_searches_clicks["doc1"]),1,0)
-    df_searches_clicks["is in 2"] = np.where(df_searches_clicks["doc"].isin(df_searches_clicks["doc2"]), 1, 0)
-    df_searches_clicks["is in 3"] = np.where(df_searches_clicks["doc"].isin(df_searches_clicks["doc3"]), 1, 0)
-    df_searches_clicks["is in 4"] = np.where(df_searches_clicks["doc"].isin(df_searches_clicks["doc4"]), 1, 0)
-    df_searches_clicks["is in 5"] = np.where(df_searches_clicks["doc"].isin(df_searches_clicks["doc5"]), 1, 0)
-    df_searches_clicks["Reussi"]= df_searches_clicks[["is in 1","is in 2","is in 3","is in 4","is in 5",]].max(axis=1)
-
-
-    moyenne=df_searches_clicks["Reussi"].mean()
-
-
-
-    print(df_searches_clicks)
-    print(moyenne)
-    return moyenne
 
 def custom_scorer(estimator,X,y):
     """
@@ -61,11 +32,36 @@ def custom_scorer(estimator,X,y):
 
 
 
-if __name__ == "__main__":
+def predict_top5_and_export_csv(estimator,X,obj_label):
 
-    df1 = pd.DataFrame({'doc': ['a', 'b', 't', 'd'],"search_id":[2,1,3,4]})
-    df2 = pd.DataFrame({'doc1': ['g','w','r', 't'],'doc2': ['a','a','s', 't'],'doc3': ['a','z','t', 'g'],'doc4': ['b','f','t', 't'],'doc5': ['a','g','t', 'm'],"search_id":[1,2,4,3]})
-    score_from_data_frame(df2,df1)
+    #TESTING À RETIRER
+    #pipeline_transformation_seulement=pipeline.Pipeline(estimator.steps[:-1])#Pogne la pipeline, sans la classification
+    #print(pipeline_transformation_seulement.transform(X)) #La transformation du data set complet se fait bien
+    #X=X[:440] #plus haute valeur bug, car manque données dans search_nresults
+    #FIN TESTING
+
+    proba_ordered_by_classes = estimator.predict_proba(X)
+
+    ordered_classes = estimator.classes_
+    best_proba_order = np.argsort(proba_ordered_by_classes)
+
+    best_classes = ordered_classes[best_proba_order]
+    top5_classes = best_classes[:, -5:]
+
+
+    #Convertion labels et exportation
+    data={}
+    data["search_id"]=X["search_id"]
+    j=1
+    for i in range(4,-1,-1):
+        test=top5_classes[:,i]
+        data["doc{}".format(j)]=obj_label.inverse_transform(test)
+        j+=1
+
+
+    frame=pd.DataFrame(data)
+    frame.to_csv("predictions.csv", sep=',', encoding='utf-8',index=False)
+    print("Fichier exporté sous le nom: predictions.csv")
 
 
 
