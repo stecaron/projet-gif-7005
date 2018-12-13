@@ -12,6 +12,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
 from Score_thats_it import custom_scorer,predict_top5_and_export_csv
 import numpy as np
+from sklearn.impute import  SimpleImputer
 
 from grid_search_utility import Make_All_Grid_Search_Models
 
@@ -20,7 +21,7 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #################################################
 config = {
         "Merge type": "merge_steph",
-
+        "Show test bidon": False,  # À enlever éventuellement
         "Create all grid searchs": {"Do it": True,
                                     "Save name": "Full_20181202"},
 
@@ -29,7 +30,7 @@ config = {
 
         "Show me the best grid": {"Do it": True,
                                   "Load name": "Full_20181202"},
-        "Export csv": False  # À faire
+        "Export csv": True
         }
 
 # Explications :
@@ -42,10 +43,12 @@ config = {
 
 # "Show me the best grid" si "Do it" ==True ça load le modèle avec les meilleur paramètes à partir des meilleurs paramètres
 
+# "Export csv" permet d'exporter les prédictions du meilleur modèle en version csv
 
 # Utiliser skleanr v0.2
 def main():
 
+    # DATA
     raw_data = import_raw_data()
 
     df_searches_clicks_train = sophisticated_merge(raw_data["coveo_searches_train"],
@@ -56,7 +59,7 @@ def main():
                                         raw_data["coveo_clicks_valid"],
                                         on="search_id")
 
-    # Labels
+    # LABELS
     obj_labels_encoder = LabelEncoder()
     labels_train = df_searches_clicks_train["document_id"].tolist()
     labels_test = df_searches_clicks_valid["document_id"].tolist()
@@ -64,6 +67,9 @@ def main():
 
     y_train = obj_labels_encoder.transform(labels_train)
     y_valid = obj_labels_encoder.transform(labels_test)
+
+
+
 
     # Pour accélérer tests À RETIRER
     df_searches_clicks_train = df_searches_clicks_train[:2000]
@@ -78,8 +84,9 @@ def main():
                                                      "user_language"])),
         ("normalize_query", NormalizeQuery(normalize_method="None")),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
-        ("categorical_var_to_num", TransformCategoricalVar())
-        
+        ("categorical_var_to_num", TransformCategoricalVar()),
+        ("Fill_missing", SimpleImputer(strategy="mean"))
+
      ])
 
 
@@ -123,8 +130,35 @@ def main():
         print("Score sur valid (utilisées comme test):", score_test)
 
         if config["Export csv"]:
+
             predict_top5_and_export_csv(final_pipe, raw_data["coveo_searches_test"], obj_labels_encoder)
 
+
+
+    if config["Show test bidon"]:
+        #Example d'une pipeline détaillé
+        optimise_bidon = 0
+        if optimise_bidon == 1:
+            # Combine le transformer de data frame et le classifier
+            final_pipe = pipeline.Pipeline([
+                ("Transformer", transformation_pipeline),
+                ("Classifier", MLPClassifier())
+            ])
+
+            grille_finale = {
+                "Transformer__vectorize_query__freq_min": [1, 2],
+                "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"],
+                "Classifier__activation": ["relu", "tanh"]
+
+            }
+            grid_search = GridSearchCV(final_pipe, grille_finale, scoring=custom_scorer, cv=2)
+            grid_search.fit(mini_df, mini_y)
+
+            # Print
+            print("\n Liste paramètres et scores")
+            print("\n Grid search sur pipeline best:")
+            print(grid_search.best_params_)
+            print(grid_search.best_score_)
 
 if __name__ == "__main__":
     main()
