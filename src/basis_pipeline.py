@@ -1,7 +1,7 @@
 import pandas as pd
 from import_data import import_raw_data,sophisticated_merge
 from sklearn import pipeline
-from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar
+from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar, NormalizeQuery
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
@@ -20,17 +20,16 @@ from grid_search_utility import Make_All_Grid_Search_Models
 # Config
 #################################################
 config = {
-        "Merge type": "basic",
+        "Merge type": "merge_steph",
         "Show test bidon": False,  # À enlever éventuellement
-
-        "Create all grid searchs": {"Do it": False,
-                                    "Save name": "basic"},
+        "Create all grid searchs": {"Do it": True,
+                                    "Save name": "Full_20181202"},
 
         "Show me all the grids": {"Do it": True,
-                                  "Load name": "basic"},
+                                  "Load name": "Full_20181202"},
 
         "Show me the best grid": {"Do it": True,
-                                  "Load name": "basic"},
+                                  "Load name": "Full_20181202"},
         "Export csv": True
         }
 
@@ -83,26 +82,13 @@ def main():
                                                      "search_nresults",
                                                      "user_country",
                                                      "user_language"])),
+        ("normalize_query", NormalizeQuery(normalize_method="None")),
         ("vectorize_query", VectorizeQuery(vectorize_method="count", freq_min=2)),
         ("categorical_var_to_num", TransformCategoricalVar()),
         ("Fill_missing", SimpleImputer(strategy="mean"))
 
      ])
 
-    if config["Show test bidon"]:
-        # TEST BIDON
-        # POUR TEST, À RETIRER
-        mini_y = y_train[:1000]
-        mini_df = df_searches_clicks_train[:1000]
-
-        mini_y_test = y_train[1001:2000]
-        mini_df_test = df_searches_clicks_train[1001:2000]
-
-        X_essai_transformation = transformation_pipeline.fit_transform(mini_df)
-        print(X_essai_transformation)
-
-        X_test = transformation_pipeline.transform(mini_df_test)
-        print(X_test)
 
     ####################################################################################################################
     # Optimisation avec Grid search
@@ -110,7 +96,9 @@ def main():
 
     grille_transformer = {
         "Transformer__vectorize_query__freq_min": [1, 2],
-        "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"]
+        "Transformer__normalize_query__normalize_method": ["PorterStemmer", "None"],
+        "Transformer__vectorize_query__vectorize_method": ["count", "binary count", "Word2Vec", "tf-idf"]
+
     }
     estimators = {
         "MLP": MLPClassifier(),
@@ -118,9 +106,8 @@ def main():
         "KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"],"Classifier__hidden_layer_sizes":[(100,),(100,100)]},
-        # "XGB": {"Classifier__n_estimators": [10, 32]},
-        "KNN": {"Classifier__n_neighbors": [1, 3, 10, 15], "Classifier__weights": ["uniform", "distance"]}
+        "MLP": {"Classifier__activation": ["relu", "tanh"]},
+        "KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
 
@@ -172,7 +159,6 @@ def main():
             print("\n Grid search sur pipeline best:")
             print(grid_search.best_params_)
             print(grid_search.best_score_)
-
 
 if __name__ == "__main__":
     main()
