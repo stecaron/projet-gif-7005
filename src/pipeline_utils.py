@@ -31,8 +31,9 @@ class FilterColumns(BaseEstimator, TransformerMixin):
 
 
 class NormalizeQuery(BaseEstimator, TransformerMixin):
-    def __init__(self, normalize_method):
+    def __init__(self, normalize_method, transformation_target="query_expression"):
         self.normalize_method = normalize_method
+        self.transformation_target = transformation_target
 
     def fit(self, X, y=None):
         return self
@@ -44,7 +45,7 @@ class NormalizeQuery(BaseEstimator, TransformerMixin):
         elif self.normalize_method == "PorterStemmer":
             ps = PorterStemmer()
             stemmed_queries = []
-            for i, sentence in enumerate(X["query_expression"]):
+            for i, sentence in enumerate(X[self.transformation_target]):
                 words = word_tokenize(sentence)
 
                 stemmed_words = []
@@ -54,7 +55,7 @@ class NormalizeQuery(BaseEstimator, TransformerMixin):
 
                 stemmed_queries.append(" ".join(word for word in stemmed_words))
 
-            X.loc[:, ("query_expression")] = stemmed_queries
+            X.loc[:, (self.transformation_target)] = stemmed_queries
 
         else:
             raise NotImplementedError("Unknown normalize_method")
@@ -68,14 +69,15 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
     Transforme chacun des mots en une colone de mot comptable avec selon une technique(vectorize_method)
     """
 
-    def __init__(self, vectorize_method, freq_min=1):
+    def __init__(self, vectorize_method, freq_min=1, transformation_target="query_expression"):
 
         self.vectorize_method = vectorize_method
         self.freq_min = freq_min
+        self.transformation_target = transformation_target
 
     def fit(self, X, y=None):
         self.update_class_vectorizer()
-        queries = X["query_expression"].values.tolist()
+        queries = X[self.transformation_target].values.tolist()
         # Traitement particulier pour Word2Vec
         if self.vectorize_method == "Word2Vec":
             tokenized_queries = [word_tokenize(i) for i in queries]
@@ -100,7 +102,7 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
 
-        queries = X["query_expression"].values.tolist()
+        queries = X[self.transformation_target].values.tolist()
         if self.vectorize_method == "Word2Vec":
             vectorized_queries = []
             tokenized_queries = [word_tokenize(i) for i in queries]
@@ -123,7 +125,7 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
             df_vectorized_queries = pd.DataFrame(vectorized_queries.toarray(), columns=self.vect.get_feature_names())
 
         X = X.reset_index(drop=True)
-        X = X.drop(columns=["query_expression"])
+        X = X.drop(columns=[self.transformation_target])
 
         df_avec_nouvelles_valeurs = pd.concat([X, df_vectorized_queries], axis=1)
 
