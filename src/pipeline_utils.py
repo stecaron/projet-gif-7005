@@ -55,7 +55,7 @@ class NormalizeQuery(BaseEstimator, TransformerMixin):
 
                 stemmed_queries.append(" ".join(word for word in stemmed_words))
 
-            X.loc[:, (self.transformation_target)] = stemmed_queries
+            X.loc[:, self.transformation_target] = stemmed_queries
 
         else:
             raise NotImplementedError("Unknown normalize_method")
