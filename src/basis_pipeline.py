@@ -1,5 +1,5 @@
 import pandas as pd
-from import_data import import_raw_data,sophisticated_merge
+from import_data import import_raw_data, sophisticated_merge
 from sklearn import pipeline
 from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar, NormalizeQuery
 from sklearn.neighbors import KNeighborsClassifier

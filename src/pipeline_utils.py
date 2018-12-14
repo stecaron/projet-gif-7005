@@ -46,7 +46,11 @@ class NormalizeQuery(BaseEstimator, TransformerMixin):
             ps = PorterStemmer()
             stemmed_queries = []
             for i, sentence in enumerate(X[self.transformation_target]):
-                words = word_tokenize(sentence)
+                try:
+                    words = word_tokenize(sentence)
+
+                except TypeError:
+                    words = []
 
                 stemmed_words = []
 
