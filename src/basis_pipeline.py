@@ -13,8 +13,10 @@ from sklearn.model_selection import GridSearchCV
 from Score_thats_it import custom_scorer,predict_top5_and_export_csv
 import numpy as np
 from sklearn.impute import  SimpleImputer
-
+import pickle
 from grid_search_utility import Make_All_Grid_Search_Models
+
+from clustering import merge_find_document_cluster
 
 #################################################
 # Config
@@ -30,7 +32,7 @@ config = {
 
         "Show me the best grid": {"Do it": True,
                                   "Load name": "Full_20181202"},
-        "Export csv": True
+        "Export csv": False
         }
 
 # Explications :
@@ -51,22 +53,31 @@ def main():
     # DATA
     raw_data = import_raw_data()
 
-    df_searches_clicks_train = sophisticated_merge(raw_data["coveo_searches_train"],
-                                                   raw_data["coveo_clicks_train"],
-                                                   config["Merge type"])
+    data_train = merge_find_document_cluster(raw_data, config["Merge type"], n_clusters=50)
+
+    df_searches_clicks_train = data_train[0]
+
+
+    five_doc_per_cluster_dict = data_train[1]
+    with open('five_doc_per_cluster_dict.pkl', 'wb') as fich:
+        fich.write(pickle.dumps(five_doc_per_cluster_dict, pickle.HIGHEST_PROTOCOL))
 
     df_searches_clicks_valid = pd.merge(raw_data["coveo_searches_valid"],
                                         raw_data["coveo_clicks_valid"],
                                         on="search_id")
 
     # LABELS
-    obj_labels_encoder = LabelEncoder()
-    labels_train = df_searches_clicks_train["document_id"].tolist()
-    labels_test = df_searches_clicks_valid["document_id"].tolist()
-    obj_labels_encoder.fit(labels_train+labels_test)
+    #obj_labels_encoder = LabelEncoder()
+    #labels_train = df_searches_clicks_train["document_id"].tolist()
+    #labels_test = df_searches_clicks_valid["document_id"].tolist()
+    #obj_labels_encoder.fit(labels_train+labels_test)
+    #y_train = obj_labels_encoder.transform(labels_train)
+    #y_valid = obj_labels_encoder.transform(labels_test)
 
-    y_train = obj_labels_encoder.transform(labels_train)
-    y_valid = obj_labels_encoder.transform(labels_test)
+    y_train = np.array(df_searches_clicks_train['document_cluster'], dtype=int)
+    y_valid = np.array(df_searches_clicks_valid['document_id'], dtype=str)
+
+    df_searches_clicks_train = df_searches_clicks_train.drop('document_cluster', axis=1)
 
     # Pour accélérer tests À RETIRER
     df_searches_clicks_train = df_searches_clicks_train[:2000]
@@ -96,13 +107,13 @@ def main():
 
     }
     estimators = {
-        "MLP": MLPClassifier(),
+        "MLP": MLPClassifier()#,
         # "XGB": GradientBoostingClassifier(),
-        "KNN": KNeighborsClassifier()
+        #"KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"]},
-        "KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
+        "MLP": {"Classifier__activation": ["relu", "tanh"]}#,
+        #"KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
 

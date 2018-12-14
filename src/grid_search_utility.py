@@ -34,7 +34,7 @@ class Make_All_Grid_Search_Models():
                 ("Classifier", self.estimators[key])
             ])
             print("Testing for classifier {}".format(key))
-            grid_search = GridSearchCV(final_pipe, final_grid, cv=2, scoring=custom_scorer)
+            grid_search = GridSearchCV(final_pipe, final_grid,  cv=2, scoring=custom_scorer)
             grid_search.fit(X, y)
 
             scores_moyens = grid_search.cv_results_['mean_test_score']

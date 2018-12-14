@@ -130,8 +130,10 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
 
         X = X.reset_index(drop=True)
         X = X.drop(columns=[self.transformation_target])
-
-        df_avec_nouvelles_valeurs = pd.concat([X, df_vectorized_queries], axis=1)
+        if self.transformation_target == "query_expression":
+            df_avec_nouvelles_valeurs = pd.concat([X, df_vectorized_queries], axis=1)
+        else:
+            df_avec_nouvelles_valeurs = pd.concat([X["document_id"], df_vectorized_queries], axis=1)
 
         return df_avec_nouvelles_valeurs
 

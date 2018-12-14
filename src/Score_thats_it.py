@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn import pipeline
-
+import pickle
 
 def custom_scorer(estimator,X,y):
     """
@@ -11,7 +11,9 @@ def custom_scorer(estimator,X,y):
     :param y:
     :return:
     """
-
+    with open('five_doc_per_cluster_dict.pkl', 'rb') as fich:
+        seq_bin = fich.read()
+        dictio_cluster = pickle.loads(seq_bin)
     #On pourrait modifier ça si on utilise un clf qui n'a pas la fonction
     proba_ordered_by_classes=estimator.predict_proba(X)
 
@@ -19,9 +21,12 @@ def custom_scorer(estimator,X,y):
     ordered_classes=estimator.classes_
     best_proba_order=np.argsort(proba_ordered_by_classes)
 
-    best_classes=ordered_classes[best_proba_order]
-    top5_classes=best_classes[:,-5:]
-
+    best_classes = ordered_classes[best_proba_order][:, -1:]
+    top5_classes_list = []
+    for elem in best_classes:
+        top5_classes_list.append(dictio_cluster[int(elem)])
+    top5_classes = np.array(top5_classes_list, dtype=str)
+    #top5_classes=best_classes[:,-5:]
     def fn(x):
         return x==y
 
@@ -45,8 +50,11 @@ def predict_top5_and_export_csv(estimator,X,obj_label):
     ordered_classes = estimator.classes_
     best_proba_order = np.argsort(proba_ordered_by_classes)
 
-    best_classes = ordered_classes[best_proba_order]
+    best_classes = ordered_classes[best_proba_order][0]
+    #top5_classes = dictio_cluster[best_classes]
+
     top5_classes = best_classes[:, -5:]
+
 
 
     #Convertion labels et exportation
