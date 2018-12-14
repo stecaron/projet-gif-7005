@@ -18,15 +18,12 @@ from sklearn.manifold import MDS, TSNE
 from matplotlib import pyplot
 import numpy
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 import warnings
 
 from grid_search_utility import Make_All_Grid_Search_Models
 
-raw_data = import_raw_data()
-def merge_find_document_cluster(data , merge_type, n_clusters):
-    data = raw_data
-    merge_type = 'merge_steph'
-    n_clusters = 50
+def merge_find_document_cluster(data , merge_type, n_clusters, algo_cluster):
     df_searches_clicks_train = sophisticated_merge(data["coveo_searches_train"],
                                                    data["coveo_clicks_train"],
                                                    merge_type)
@@ -39,9 +36,13 @@ def merge_find_document_cluster(data , merge_type, n_clusters):
     vectorize_query.fit(y_normalize)
     y_vectorize = vectorize_query.transform(y_normalize)
 
-    y_model_cluster = KMeans(n_clusters=n_clusters, random_state=42)
-    y_model_cluster.fit(y_vectorize.drop('document_id', axis=1))
-    y_train_cluster = y_model_cluster.labels_.reshape(-1, 1)
+    if algo_cluster == 'KMeans':
+        y_model_cluster = KMeans(n_clusters=n_clusters, random_state=42)
+        y_model_cluster.fit(y_vectorize.drop('document_id', axis=1))
+        y_train_cluster = y_model_cluster.labels_.reshape(-1, 1)
+    else:
+        y_model_cluster = GaussianMixture(n_components=n_clusters, init_params='kmeans')
+        y_train_cluster = y_model_cluster.fit_predict(y_vectorize.drop('document_id', axis=1)).reshape(-1, 1)
     document_id_array = numpy.array(df_searches_clicks_train_unique['document_id']).reshape(-1, 1)
     document_id_cluster = numpy.concatenate((document_id_array, y_train_cluster), axis=1)
     document_id_cluster_df = pd.DataFrame(data=document_id_cluster, columns=['document_id', 'document_cluster'])

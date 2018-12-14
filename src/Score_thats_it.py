@@ -20,16 +20,18 @@ def custom_scorer(estimator,X,y):
 
     ordered_classes=estimator.classes_
     best_proba_order=np.argsort(proba_ordered_by_classes)
+    if type(y[0]) is np.int64:
+        best_classes = ordered_classes[best_proba_order]
+        top5_classes = best_classes[:, -5:]
+    else:
+        best_classes = ordered_classes[best_proba_order][:, -1:]
+        top5_classes_list = []
+        for elem in best_classes:
+            top5_classes_list.append(dictio_cluster[int(elem)])
+        top5_classes = np.array(top5_classes_list, dtype=str)
 
-    best_classes = ordered_classes[best_proba_order][:, -1:]
-    top5_classes_list = []
-    for elem in best_classes:
-        top5_classes_list.append(dictio_cluster[int(elem)])
-    top5_classes = np.array(top5_classes_list, dtype=str)
-    #top5_classes=best_classes[:,-5:]
     def fn(x):
         return x==y
-
 
     mat_bool=np.apply_along_axis(fn,axis=0,arr=top5_classes)
 

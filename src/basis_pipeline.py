@@ -15,8 +15,10 @@ import numpy as np
 from sklearn.impute import  SimpleImputer
 import pickle
 from grid_search_utility import Make_All_Grid_Search_Models
-
+import warnings
+from sklearn.exceptions import ConvergenceWarning
 from clustering import merge_find_document_cluster
+
 
 #################################################
 # Config
@@ -27,7 +29,7 @@ config = {
         "Create all grid searchs": {"Do it": True,
                                     "Save name": "Full_20181202"},
 
-        "Show me all the grids": {"Do it": True,
+        "Show me all the grids": {"Do it": False,
                                   "Load name": "Full_20181202"},
 
         "Show me the best grid": {"Do it": True,
@@ -48,12 +50,13 @@ config = {
 # "Export csv" permet d'exporter les prédictions du meilleur modèle en version csv
 
 # Utiliser skleanr v0.2
-def main():
-
+def main(n_clusters):
+    pd.set_option('mode.chained_assignment', None)
+    warnings.filterwarnings("ignore", category=ConvergenceWarning)
     # DATA
     raw_data = import_raw_data()
 
-    data_train = merge_find_document_cluster(raw_data, config["Merge type"], n_clusters=50)
+    data_train = merge_find_document_cluster(raw_data, config["Merge type"], n_clusters=n_clusters, algo_cluster='KMeans')
 
     df_searches_clicks_train = data_train[0]
 
@@ -107,12 +110,12 @@ def main():
 
     }
     estimators = {
-        "MLP": MLPClassifier()#,
+        "MLP": MLPClassifier(),
         # "XGB": GradientBoostingClassifier(),
         #"KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"]}#,
+        "MLP": {"Classifier__activation": ["relu", "tanh"]},
         #"KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
@@ -166,4 +169,7 @@ def main():
             print(grid_search.best_score_)
 
 if __name__ == "__main__":
-    main()
+    k = [i for i in range(150, 210, 10)]
+    for clust in k:
+        print('test pour n_cluster = {}'.format(clust))
+        main(n_clusters=clust)
