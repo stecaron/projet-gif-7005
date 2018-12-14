@@ -7,3 +7,33 @@ Points à traiter:
 	- Pipeline et recherche en grille
 	- Paramètres testés
 	
+	
+- Début du vrai texte
+
+
+
+Avant de débuter l'optimisation de notre modèle, nous avons défini quelle mesure de score allait être utilisée pour l'évaluation de notre modèle afin de baser nos développements sur celle-ci.
+Puisque l'évaluation de notre modèle sera faire en regardant si le document pertinent se trouve dans la liste des 5 documents les plus pertinents fournis selon notre modèle, nous nous sommes bâti une fonction de score qui retourne le pourcentage de réussite selon ce critère particulier.
+
+Également, afin d'évaluer notre modèle, nous avons décidé d'utiliser le partitionnement des données déjà fait par Coveo. Nous avons vérifié que cette séparation des données avait été faite de façon aléatoire en confirmant que les dates de recherche n'étaient pas ordonnées.
+
+Puisque nos données brutes contiennent des informations de plusieurs types, dont des données textuelles qu'on ne peut pas directement utiliser dans les algorithmes d'apprentissage automatique, nous devions faire non seulement beaucoup de travail sur l'optimisation des hyper-paramètres de nos modèles, mais aussi sur le choix des pré-traitements à faire sur nos données.
+
+Pour attaquer de façon claire le problème de l'optimisation des pré-traitements, nous avons utilisé le module \emph{pipeline} de la librairie Python \emph{sklearn}.
+Ce dernier nous permet de définir nos différentes étapes de pré-traitement par des classes dont les paramètres sont modifiables.
+On procédant ainsi, on peut simplement faire une recherche en grille comme on le ferait avec n'importe quel modèle, mais en testant plutôt différentes combinaisons de pré-traitements.
+
+Également, puisque le nombre de classes possibles à prédire est très grand, nous avons analysé la possibilité de faire du clustering sur nos variables réponses pour créer des clusters de documents desquels on prédirait les 5 documents les plus fréquents. Ceci permettrait à notre modèle de travailler avec un nombre plus restreint de classes et ainsi de mieux capter le signal pour chacune d'elles.
+Les clusters ainsi créés représentent donc des documents semblables.
+Puisque le clustering des documents se fait sur leur titre, les clusters regroupent donc des documents traitant de sujets similaires.
+
+Les différentes étapes de notre \emph{pipeline} sont donc les suivantes:
+\begin{itemize}
+	\item Filtre des champs conservés
+	\item Normalisation des requêtes (stemming)
+	\item Vectorisation des requêtes (tokenization, vecteur de fréquence, TF-IDF, Word2Vec)
+	\item Transformation des variables catégoriques en variables indicatrices
+	\item Imputation des données manquantes
+\end{itemize}
+	
+
