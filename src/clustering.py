@@ -1,7 +1,7 @@
 import pandas as pd
 from import_data import import_raw_data,sophisticated_merge
 from sklearn import pipeline
-from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar, NormalizeQuery
+from pipeline_utils import FilterColumns, TokenizeQuery, VectorizeQuery, TransformCategoricalVar, NormalizeQuery, RemoveStopWords
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
@@ -22,15 +22,22 @@ from sklearn.mixture import GaussianMixture
 import warnings
 
 from grid_search_utility import Make_All_Grid_Search_Models
+data=import_raw_data()
+merge_type="merge_steph"
 
 def merge_find_document_cluster(data , merge_type, n_clusters, algo_cluster):
+
     df_searches_clicks_train = sophisticated_merge(data["coveo_searches_train"],
                                                    data["coveo_clicks_train"],
                                                    merge_type)
+
+    df_searches_clicks_train = df_searches_clicks_train.dropna(subset=['document_title'])
+
     df_searches_clicks_train_unique = df_searches_clicks_train.drop_duplicates(subset="document_id")
+    y_stop_words = RemoveStopWords(df_searches_clicks_train_unique)
 
     normalize_query = NormalizeQuery(normalize_method="PorterStemmer", transformation_target="document_title")
-    y_normalize = normalize_query.transform(df_searches_clicks_train_unique)
+    y_normalize = normalize_query.transform(y_stop_words)
 
     vectorize_query = VectorizeQuery(vectorize_method='tf-idf', transformation_target="document_title")
     vectorize_query.fit(y_normalize)
@@ -59,3 +66,7 @@ def merge_find_document_cluster(data , merge_type, n_clusters, algo_cluster):
             five_best_doc[i] = five_best_doc[i] + [''] * (5-len(five_best_doc[i]))
             five_best_doc[i] = np.array(five_best_doc[i], dtype=str)
     return df_searches_clicks_train_cluster, five_best_doc
+
+#if __name__ == "__main__":
+    #raw_data = import_raw_data()
+    #test = merge_find_document_cluster(data=raw_data, merge_type="merge_steph", n_clusters=50, algo_cluster='KMeans')

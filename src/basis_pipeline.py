@@ -50,13 +50,13 @@ config = {
 # "Export csv" permet d'exporter les prédictions du meilleur modèle en version csv
 
 # Utiliser skleanr v0.2
-def main(n_clusters):
+def main(n_clusters , algo_cluster):
     pd.set_option('mode.chained_assignment', None)
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     # DATA
     raw_data = import_raw_data()
 
-    data_train = merge_find_document_cluster(raw_data, config["Merge type"], n_clusters=n_clusters, algo_cluster='KMeans')
+    data_train = merge_find_document_cluster(raw_data, config["Merge type"], n_clusters=n_clusters, algo_cluster=algo_cluster)
 
     df_searches_clicks_train = data_train[0]
 
@@ -169,7 +169,8 @@ def main(n_clusters):
             print(grid_search.best_score_)
 
 if __name__ == "__main__":
-    k = [i for i in range(150, 210, 10)]
+    k = [i for i in range(80, 210, 10)]
+    algo = 'KMeans'
     for clust in k:
         print('test pour n_cluster = {}'.format(clust))
-        main(n_clusters=clust)
+        main(n_clusters=clust, algo_cluster=algo)

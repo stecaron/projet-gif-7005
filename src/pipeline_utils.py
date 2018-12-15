@@ -7,7 +7,10 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
 from nltk.stem import PorterStemmer
+import nltk
+from nltk.corpus import stopwords
 
 import pandas as pd
 import numpy as np
@@ -29,6 +32,18 @@ class FilterColumns(BaseEstimator, TransformerMixin):
 
         return X
 
+
+def RemoveStopWords(X, transformation_target="document_title"):
+    nltk.download('stopwords')
+    stop_words = set(stopwords.words('english'))
+    filtered_expression = []
+    for i, sentence in enumerate(X[transformation_target]):
+        words = word_tokenize(sentence)
+        words2 = [w if w != 'Coveo' else 'company' for w in words]
+        filtered_words = [w for w in words2 if not w in stop_words]
+        filtered_expression.append(" ".join(word for word in filtered_words))
+    X.loc[:, transformation_target] = filtered_expression
+    return X
 
 class NormalizeQuery(BaseEstimator, TransformerMixin):
     def __init__(self, normalize_method, transformation_target="query_expression"):
@@ -86,8 +101,11 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
         if self.vectorize_method == "Word2Vec":
             tokenized_queries = [word_tokenize(i) for i in queries]
             tokenized_queries = create_unk_tokens(tokenized_queries)
-
-            self.vect = Word2Vec(tokenized_queries, min_count=self.freq_min)
+            if self.transformation_target == 'document_title':
+                modelVec = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+                self.vect = modelVec
+            else:
+                self.vect = Word2Vec(tokenized_queries, min_count=self.freq_min)
 
         else:
             self.vect.fit(queries)
@@ -117,7 +135,10 @@ class VectorizeQuery(BaseEstimator, TransformerMixin):
                         word_vecs.append(self.vect[word])
 
                     except KeyError:
-                        word_vecs.append(self.vect["<UNK>"])
+                        if self.transformation_target == "document_title":
+                            word_vecs.append(self.vect["unknown"])
+                        else:
+                            word_vecs.append(self.vect["<UNK>"])
 
                 vectorized_queries.append(np.mean(np.array(word_vecs), 0))
 
@@ -269,6 +290,4 @@ def create_unk_tokens(tokenized_sentences):
         transformed_tokens.append(sentence)
 
     return transformed_tokens
-
-
 

@@ -1,0 +1,26 @@
+Change dans Basis_pipeline:
+Des paramètres a main
+nos y_train et y_valid sont différents
+On save le dictio avec clé = cluster et values = liste des 5 meilleurs doc du cluster
+Rajoue dans le main pour looper sur les scénario de Y
+
+
+Clustering:
+renvoie le dataframe avec une colonne des cluster
+renvoie le dictio avec clé = cluster et values = liste des 5 meilleurs doc du cluster
+Si on prend Word2Vec, il faut mettre normalize à None et il faut dowloader GoogleNews-vectors-negative300.bin
+On peux décider d'enlever les StopWords
+
+Score_thats_it
+changer la fct custom_scorer
+Elle prend le best cluster et va matcher avec le dictio pour avoir les 5 bests document_id POUR Y_VALID SEULEMENT
+Pour la cross validation quand ça fit, ça fait le score avec cluster prédit = vrai cluster
+
+pipeline_utils
+ajout de la variable transformation_target dans les classes Pour distinguer quand on travaille sur document_title ou query_expression
+Ajout d'une fonction remove StopWords pour les document_title ****ÇA CHANGE COVEO EN COMPANY*****
+Dans Vectorize pour Word2Vec si on est pour les document_title, ça prend le pretrained de google et la valeur par défaut est 'unknown'
+
+C'est à peu près so
+Dans Cluster_results ya les result pour KMeans selon les k avec le best MLP en grid avec td-idf, PorterStemmer, sans remove StopWords
+
