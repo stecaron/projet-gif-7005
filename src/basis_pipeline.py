@@ -23,13 +23,13 @@ config = {
         "Merge type": "merge_steph",
 
         "Create all grid searchs": {"Do it": True,
-                                    "Save name": "Full_20181202"},
+                                    "Save name": "Full_run"},
 
         "Show me all the grids": {"Do it": True,
-                                  "Load name": "Full_20181202"},
+                                  "Load name": "Full_run"},
 
         "Show me the best grid": {"Do it": True,
-                                  "Load name": "Full_20181202"},
+                                  "Load name": "Full_run"},
         "Export csv": True
         }
 
@@ -100,8 +100,8 @@ def main():
         "KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"],"Classifier__hidden_layer_sizes":[(100,),(100,100),(100,100,100),(100,100,100,100)]},
-        "KNN": {"Classifier__n_neighbors": [1, 3, 8, 11, 15, 20, 25, 30, 50, 100], "Classifier__weights": ["uniform", "distance"]}
+        "MLP": {"Classifier__activation": ["relu"],"Classifier__hidden_layer_sizes":[(100,),(100,100),(100,100,100)]},
+        "KNN": {"Classifier__n_neighbors": [1, 3, 8, 11, 15, 25, 50], "Classifier__weights": ["uniform", "distance"]}
 
     }
 

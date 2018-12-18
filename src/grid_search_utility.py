@@ -46,6 +46,9 @@ class Make_All_Grid_Search_Models():
 
             list_all_grid_search.append(dict_model)
 
+            #Ajout sauvegarde temporaire pour chaque classifieur
+            pickle.dump(dict_model, open(save_name +"_" + key + ".p", "wb"))
+
         pickle.dump(list_all_grid_search, open(save_name+".p", "wb"))
 
     def return_best_pipeline(self, X, y, load_name):
