@@ -1,14 +1,3 @@
-Ici, on parle de la manière dont on applique les grandes lignes décrites auparavant.
-
-Points à traiter:
-	- Méthodologie de validation (Séparation du jeu de données)
-	- Mesure de score utilisée (Précision sur recommandation de 5 documents car métrique d'évaluation de Coveo)
-	- Utilisation des données sans clicks et à plusieurs clicks
-	- Pipeline et recherche en grille
-	- Paramètres testés
-	
-	
-- Début du vrai texte
 
 Avant même de créer les attributs, il était nécessaire de faire la jonction entre les différents jeux de données pour entres autres indiquer au modèle quelle requête a menée à quel document. D'abord, voici les différents jeux de données (avec le nombre d'observations) à notre disposition:
 
@@ -20,7 +9,7 @@ Avant même de créer les attributs, il était nécessaire de faire la jonction 
      \hline
      \textit{searches} & 52133 & 14895 & 7448 \\ 
      \hline
-     \textit{clicks} & 24491 & 6920 & 3567 \\ 
+     \textit{clicks} & 24491 & 6920 & ?? \\ 
      \hline
   \end{tabular}
 \end{center}
@@ -40,46 +29,48 @@ La colonne E correspond à l'ensemble d'entraînement, la colonne V à l'ensembl
 
 \subsection{Prétaitements des données}
 
-Maintenant que nous avons des observations avec des variables explicatives et des étiquettes, la prochaine étape consiste à effectuer certains prétraitements sur ce jeu de données.
+Maintenant que nous avons des observations avec des variables explicatives et des étiquettes, la prochaine étape consiste à effectuer certains prétraitements sur ce jeu de données. Nous avons fait plusieurs combinaisons de pré-traitements de données. Premièrement, nous avons sélectionner les variables que nous voulions inclure dans notre modèle prédictif, c'est à dire : \texttt{querry\_expression}, \texttt{search \_nresults}, \texttt{user\_country} et \texttt{user\_language}.
 
-Avant de débuter l'optimisation de notre modèle, nous avons défini quelle mesure de score allait être utilisée pour l'évaluation de notre modèle afin de baser nos développements sur celle-ci.
-Puisque l'évaluation de notre modèle sera faire en regardant si le document pertinent se trouve dans la liste des 5 documents les plus pertinents fournis selon notre modèle, nous nous sommes bâti une fonction de score qui retourne le pourcentage de réussite selon ce critère particulier.
+Une imputation sur les données manquantes a aussi été effectué. Lorsqu'une données était manquantes, nous avons pris la valeur moyenne de cette variable pour en faire l'imputation.
 
-Également, afin d'évaluer notre modèle, nous avons décidé d'utiliser le partitionnement des données déjà fait par Coveo. Nous avons vérifié que cette séparation des données avait été faite de façon aléatoire en confirmant que les dates de recherche n'étaient pas ordonnées.
+En ce qui concerne les transformations sur les variables, trois type transformations ont été effectué. Premièrement, une transformation des variables catégorielles vers des valeurs numériques. Deuxièmement, une normalisation de la variable \texttt{querry\_expression} est effectuée. Finalement, cette même variable est vectorisée dans le but d'être traiter par notre modèle prédictif.
 
-Puisque nos données brutes contiennent des informations de plusieurs types, dont des données textuelles qu'on ne peut pas directement utiliser dans les algorithmes d'apprentissage automatique, nous devions faire non seulement beaucoup de travail sur l'optimisation des hyper-paramètres de nos modèles, mais aussi sur le choix des pré-traitements à faire sur nos données.
+Nous avons testés deux scénarios pour la normalisation des textes de recherches. Nous avons intègrer dans notre \textit{pipeline} la normalisation de \textit{Stemmer}, c'est-à-dire de couper les suffixes de chaques mots. Nous avons aussi laissé la possibilité de ne pas faire de normlisation. Pour la vectorisation des textes de recherches, nous avons integré quatres types de vectorisation dans notre \textit{pipeline}. Nous avons utilisé \textit{CountVectorizer} de la librairie Python \textit{sklearn}. Cette vectorisation compte l'occurence des mots dans chaques textes de recherches. Nous avons aussi testé en mettant l'option binaire, qui fait la disctinction entre la présence du mot ou non, au lieu de faire le compte. La méthode \textit{tf-idf} est également testée. Cette méthode ressemble à \textit{CountVectorizer}, mais il y a une pondération qui tient compte de la présence générale du mot dans l'essemble des documents. Le poids, $w_{i,j}$, pour chaque mot  de chaque document est calculé de cette façon :
 
-Pour attaquer de façon claire le problème de l'optimisation des pré-traitements, nous avons utilisé le module \emph{pipeline} de la librairie Python \emph{sklearn}.
-Ce dernier nous permet de définir nos différentes étapes de pré-traitement par des classes dont les paramètres sont modifiables.
-On procédant ainsi, on peut simplement faire une recherche en grille comme on le ferait avec n'importe quel modèle, mais en testant plutôt différentes combinaisons de pré-traitements.
+\begin{center}
+  w_{i,j} = tf_{i,j} \times log(\frac{N}{df_i})
+\end{center}
+
+Le $tf_{i,j}$ représente le nombre d'occurences du mot \textit{i} dans la phrase \textit{j}, $df_i$ représente le nombre d'occurences du mot \textit{i} dans l'ensemble des phrases et \textit{N} représente le nombre de phrases au total. 
+Finalement, nous avons aussi testé avec \textit{Word2Vec} de la librairie Python \textit{gensim}. ICI SAM
+
 
 \subsection{Modélisation}
 
-Également, puisque le nombre de classes po  ssibles à prédire est très grand, nous avons analysé la possibilité de faire du clustering sur nos variables réponses pour créer des clusters de documents desquels on prédirait les 5 documents les plus fréquents. Ceci permettrait à notre modèle de travailler avec un nombre plus restreint de classes et ainsi de mieux capter le signal pour chacune d'elles.
-Les clusters ainsi créés représentent donc des documents semblables.
-Puisque le clustering des documents se fait sur leur titre, les clusters regroupent donc des documents traitant de sujets similaires.
+Une fois que nous avons un jeu de données interprétable par un algorithme d'apprentissage supervisé, la prochaine étape consiste à tester différents type d'algorithme et aussi différentes combinaisons d'hyperparamètres. Voici les différents algorithmes que nous avons testé:
 
-Les différentes étapes de notre \emph{pipeline} sont donc les suivantes:
 \begin{itemize}
-	\item Fusion des données de recherche avec l'information des documents associés
-	\item Filtre des champs conservés
-	\item Normalisation des requêtes (stemming)
-	\item Vectorisation des requêtes (tokenization, vecteur de fréquence, TF-IDF, Word2Vec)
-	\item Transformation des variables catégoriques en variables indicatrices
-	\item Imputation des données manquantes
+  \item Classifieur \textit{k}-PPV
+  \item Perceptron multicouche
 \end{itemize}
 
-Évaluation des prédictions :
+Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 8, 11, 15, 25 et 50. Ensuite, nous avons également testé différentes fonction de poids: \texttt{uniform} et \texttt{distance}.
 
-Pour évaluer la performance de notre modèle, Coveo a défini ce qui constitue une bonne prédiction. Chaque document cliqué par un utilisateur après avoir effectué une recherche est considéré comme pertinent. Ce sont donc les cibles que le modèle doit prédire pour une recherche donnée. Une bonne prédiction doit prédire un ensemble d'au plus 5 documents parmi lesquels on doit retrouver au moins 1 document pertinent. Cette condition est formellement donnée par la fonction de perte suivante, qui indique qu'une perte de 1 résulte de l'absence de documents communs entre l'ensemble de 5 documents renvoyé par notre modèle de prédiction, et l'ensemble des documents cliqués pour la recherche en question :
+Pour le perceptron multicouche, nous avons seulement testé la fonction d'activation \textit{ReLu}. Cependant, nous avons testé plusieurs topographies de réseaux: 1 couche cachée avec 100 neurones, 2 couches cachées avec 100 neurones chacune et 3 couches cachées avec également 100 neurones par couche.
+\break
 
-$$
+Pour attaquer de façon claire le problème de l'optimisation des pré-traitements et de la sélection des hyperparamètres, nous avons utilisé le module \emph{pipeline} de la librairie Python \emph{sklearn}. Ce dernier nous permet de définir nos différentes étapes de pré-traitement par des classes dont les paramètres sont modifiables. En procédant ainsi, on peut faire une recherche en grille non seulement sur les hyperparamètres de nos modèles, mais aussi sur les différentes prétraitements possibles.
+\break
+
+Pour évaluer la performance de notre modèle et ainsi choisir la configuration optimale, il faut une mesure de performance. Coveo a défini ce qui constitue une bonne prédiction. Chaque document cliqué par un utilisateur après avoir effectué une recherche est considéré comme pertinent. Ce sont donc les cibles que le modèle doit prédire pour une recherche donnée. Une bonne prédiction doit prédire un ensemble d'au plus 5 documents parmi lesquels on doit retrouver au moins 1 document pertinent. Cette condition est formellement donnée par la fonction de perte suivante, qui indique qu'une perte de 1 résulte de l'absence de documents communs entre l'ensemble de 5 documents renvoyé par notre modèle de prédiction, et l'ensemble des documents cliqués pour la recherche en question :
+
+\begin{center}
 l(y_i, \widehat{y_i}):=\left\{
                           \begin{array}{ll]}
-                            i \quad\text{si } y_i \cap \widehat{y_i}=\emptyset; \\
+                            1 \quad\text{si } y_i \cap \widehat{y_i}=\emptyset; \\
                             0 \quad\text{autrement}.
                           \end{array}
                         \right.
-$$
-	
+\end{center}
+
 
