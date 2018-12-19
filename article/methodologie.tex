@@ -10,7 +10,37 @@ Points à traiter:
 	
 - Début du vrai texte
 
+Avant même de créer les attributs, il était nécessaire de faire la jonction entre les différents jeux de données pour entres autres indiquer au modèle quelle requête a menée à quel document. D'abord, voici les différents jeux de données (avec le nombre d'observations) à notre disposition:
 
+\begin{center}
+  \begin{tabular}{ |c|c|c|c| } 
+     \hline
+     Type & E & V & T \\
+     \hline
+     \hline
+     \textit{searches} & 52133 & 14895 & 7448 \\ 
+     \hline
+     \textit{clicks} & 24491 & 6920 & 3567 \\ 
+     \hline
+  \end{tabular}
+\end{center}
+
+La colonne E correspond à l'ensemble d'entraînement, la colonne V à l'ensemble de validation et la colonne T correspond à l'emsemble test. Pour ce dernier, nous avions accès aux recherches seulement et non au clicks. Comme on peut le voir, il y a plus de recherches que de clicks. Cela veut dire que certaines recherches ont mené vers aucun click. Une même recherche peut également avoir menée à plusieurs clicks. En bref, il existe plusieurs façons de joindre ces recherches avec ces clicks. Afin de nous simplifier la vie, nous avons retiré les recherches qui n'ont pas mené vers un click. De plus, nous avons également garder seulement le dernier click, en se basant sur le moment du click, pour une même recherche. Notre raisonnement derrière est que le dernier click est probablement le "bon" et que les précédents ajoutent du bruit au modèle. En somme, voici le nombre d'observations que nous avons pour les ensembles d'entraînement et de validation après ces traitements:
+
+\begin{center}
+  \begin{tabular}{ |c|c|c|c| } 
+     \hline
+     Type & E & V \\
+     \hline
+     \hline
+     \textit{searches/clicks} & 18571 & 6920 \\ 
+     \hline
+  \end{tabular}
+\end{center}
+
+\subsection{Prétaitements des données}
+
+Maintenant que nous avons des observations avec des variables explicatives et des étiquettes, la prochaine étape consiste à effectuer certains prétraitements sur ce jeu de données.
 
 Avant de débuter l'optimisation de notre modèle, nous avons défini quelle mesure de score allait être utilisée pour l'évaluation de notre modèle afin de baser nos développements sur celle-ci.
 Puisque l'évaluation de notre modèle sera faire en regardant si le document pertinent se trouve dans la liste des 5 documents les plus pertinents fournis selon notre modèle, nous nous sommes bâti une fonction de score qui retourne le pourcentage de réussite selon ce critère particulier.
@@ -23,7 +53,9 @@ Pour attaquer de façon claire le problème de l'optimisation des pré-traitemen
 Ce dernier nous permet de définir nos différentes étapes de pré-traitement par des classes dont les paramètres sont modifiables.
 On procédant ainsi, on peut simplement faire une recherche en grille comme on le ferait avec n'importe quel modèle, mais en testant plutôt différentes combinaisons de pré-traitements.
 
-Également, puisque le nombre de classes possibles à prédire est très grand, nous avons analysé la possibilité de faire du clustering sur nos variables réponses pour créer des clusters de documents desquels on prédirait les 5 documents les plus fréquents. Ceci permettrait à notre modèle de travailler avec un nombre plus restreint de classes et ainsi de mieux capter le signal pour chacune d'elles.
+\subsection{Modélisation}
+
+Également, puisque le nombre de classes po  ssibles à prédire est très grand, nous avons analysé la possibilité de faire du clustering sur nos variables réponses pour créer des clusters de documents desquels on prédirait les 5 documents les plus fréquents. Ceci permettrait à notre modèle de travailler avec un nombre plus restreint de classes et ainsi de mieux capter le signal pour chacune d'elles.
 Les clusters ainsi créés représentent donc des documents semblables.
 Puisque le clustering des documents se fait sur leur titre, les clusters regroupent donc des documents traitant de sujets similaires.
 
