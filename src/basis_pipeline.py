@@ -21,15 +21,15 @@ from grid_search_utility import Make_All_Grid_Search_Models
 #################################################
 config = {
         "Merge type": "merge_steph",
-        "Show test bidon": False,  # À enlever éventuellement
+
         "Create all grid searchs": {"Do it": True,
-                                    "Save name": "Full_20181202"},
+                                    "Save name": "Full_run"},
 
         "Show me all the grids": {"Do it": True,
-                                  "Load name": "Full_20181202"},
+                                  "Load name": "Full_run"},
 
         "Show me the best grid": {"Do it": True,
-                                  "Load name": "Full_20181202"},
+                                  "Load name": "Full_run"},
         "Export csv": True
         }
 
@@ -69,8 +69,8 @@ def main():
     y_valid = obj_labels_encoder.transform(labels_test)
 
     # Pour accélérer tests À RETIRER
-    df_searches_clicks_train = df_searches_clicks_train[:2000]
-    y_train = y_train[:2000]
+    # df_searches_clicks_train = df_searches_clicks_train[:2000]
+    # y_train = y_train[:2000]
 
     # Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline = pipeline.Pipeline([
@@ -97,12 +97,11 @@ def main():
     }
     estimators = {
         "MLP": MLPClassifier(),
-        # "XGB": GradientBoostingClassifier(),
         "KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"]},
-        "KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
+        "MLP": {"Classifier__activation": ["relu"],"Classifier__hidden_layer_sizes":[(100,),(100,100),(100,100,100)]},
+        "KNN": {"Classifier__n_neighbors": [1, 3, 8, 11, 15, 25, 50], "Classifier__weights": ["uniform", "distance"]}
 
     }
 
@@ -129,30 +128,6 @@ def main():
             predict_top5_and_export_csv(final_pipe, raw_data["coveo_searches_test"], obj_labels_encoder)
 
 
-
-    if config["Show test bidon"]:
-        #Example d'une pipeline détaillé
-        optimise_bidon = 0
-        if optimise_bidon == 1:
-            # Combine le transformer de data frame et le classifier
-            final_pipe = pipeline.Pipeline([
-                ("Transformer", transformation_pipeline),
-                ("Classifier", MLPClassifier())
-            ])
-
-            grille_finale = {
-                "Transformer__vectorize_query__freq_min": [1, 2],
-                "Transformer__vectorize_query__vectorize_method": ["count", "tf-idf"],
-                "Classifier__activation": ["relu", "tanh"]
-            }
-            grid_search = GridSearchCV(final_pipe, grille_finale, scoring=custom_scorer, cv=2)
-            grid_search.fit(mini_df, mini_y)
-
-            # Print
-            print("\n Liste paramètres et scores")
-            print("\n Grid search sur pipeline best:")
-            print(grid_search.best_params_)
-            print(grid_search.best_score_)
 
 if __name__ == "__main__":
     main()
