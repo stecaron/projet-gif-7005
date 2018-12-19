@@ -1,14 +1,17 @@
 Ici, on présente les grandes lignes conceptuelles qui ont basé notre travail.
-On souhaite entre autres présenter et référencer les modèles les plus importants qui ont été utilisés dans notre modèle.
+On souhaite entre autres présenter et référencer les modèles les plus importants qui ont été utilisés dans notre approche.
 
 On discute aussi des concepts du document recomendation et pourquoi on s'intéresse surtout à certaines variables (pourquoi beaucoup de travail sur les queries, utilisation de techniques du traitement de la langue naturelle, etc.)
 
 -- Début du vrai texte
 
-Selon le livre \emph{Introduction to Information Retrieval} de \cite{schutze2008introduction}, une approche standard en recherche d'information est de se servir du contenu des documents pour créer un jeu d'attributs pour chaque document disponible. 
-On fait ensuite la même chose avec les recherches qui ont mené à ces documents et on peut par la suite se définir une mesure de similarité entre une recherche et un document de telle sorte que la similarité soit la plus grande dans les cas où le document était pertinent pour l'utilisateur.
+Selon le livre \emph{Introduction to Information Retrieval} de \cite{schutze2008introduction}, une approche standard en recherche d'information est de se servir du contenu des documents pour créer un jeu d'attributs pour chaque document disponible. C'est d'ailleurs ce type d'approche que nous avons priorisé, comme mentionné dans la section 1.
 
-Si nos attributs sont bien construits et qu'on définit bien notre mesure de similarité, on peut ainsi facilement recommander une liste des documents les plus pertinents pour une nouvelle requête en appliquant nos traitements sur la requête et en calculant la similarité avec chacun des documents.
+On peut ensuite faire la même chose avec les recherches qui ont mené à ces documents. Cela nous permet de définir une mesure de similarité entre une recherche et un document de telle sorte que la similarité soit la plus grande dans les cas où le document était pertinent pour l'utilisateur.
+
+En 
+
+Si nos attributs sont bien construits et qu'on définit de manière effi notre mesure de similarité, on peut ainsi recommander une liste des documents pertinents basée sur une nouvelle requête en appliquant nos traitements sur celle-ci et en calculant la similarité avec chacun des documents.
 
 
 Malheureusement, n'ayant pas accès au contenu des documents à recommander, nous avons décidé d'attaquer le problème comme une situation d'apprentissage supervisé ou les classes sont l'ensemble des documents possibles et en construisant des attributs autours de nos requêtes.
