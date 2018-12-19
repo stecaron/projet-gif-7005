@@ -9,9 +9,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from gensim.models import Word2Vec
 from gensim.models import KeyedVectors
 from nltk.stem import PorterStemmer
-import nltk
 from nltk.corpus import stopwords
-
 import pandas as pd
 import numpy as np
 
@@ -34,13 +32,11 @@ class FilterColumns(BaseEstimator, TransformerMixin):
 
 
 def RemoveStopWords(X, transformation_target="document_title"):
-    nltk.download('stopwords')
     stop_words = set(stopwords.words('english'))
     filtered_expression = []
     for i, sentence in enumerate(X[transformation_target]):
         words = word_tokenize(sentence)
-        words2 = [w if w != 'Coveo' else 'company' for w in words]
-        filtered_words = [w for w in words2 if not w in stop_words]
+        filtered_words = [w for w in words if not w in stop_words]
         filtered_expression.append(" ".join(word for word in filtered_words))
     X.loc[:, transformation_target] = filtered_expression
     return X

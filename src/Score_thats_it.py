@@ -22,7 +22,7 @@ def custom_scorer(estimator,X,y):
     best_proba_order=np.argsort(proba_ordered_by_classes)
     if type(y[0]) is np.int64:
         best_classes = ordered_classes[best_proba_order]
-        top5_classes = best_classes[:, -5:]
+        top5_classes = best_classes[:, -1:]
     else:
         best_classes = ordered_classes[best_proba_order][:, -1:]
         top5_classes_list = []

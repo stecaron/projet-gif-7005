@@ -22,8 +22,8 @@ from sklearn.mixture import GaussianMixture
 import warnings
 
 from grid_search_utility import Make_All_Grid_Search_Models
-data=import_raw_data()
-merge_type="merge_steph"
+#data=import_raw_data()
+#merge_type="merge_steph"
 
 def merge_find_document_cluster(data , merge_type, n_clusters, algo_cluster):
 
@@ -35,13 +35,20 @@ def merge_find_document_cluster(data , merge_type, n_clusters, algo_cluster):
 
     df_searches_clicks_train_unique = df_searches_clicks_train.drop_duplicates(subset="document_id")
     y_stop_words = RemoveStopWords(df_searches_clicks_train_unique)
+    y_stop_words = y_stop_words.drop_duplicates(subset="document_id")
 
-    normalize_query = NormalizeQuery(normalize_method="PorterStemmer", transformation_target="document_title")
+    normalize_query = NormalizeQuery(normalize_method='PorterStemmer', transformation_target="document_title")
     y_normalize = normalize_query.transform(y_stop_words)
 
     vectorize_query = VectorizeQuery(vectorize_method='tf-idf', transformation_target="document_title")
     vectorize_query.fit(y_normalize)
     y_vectorize = vectorize_query.transform(y_normalize)
+
+    #pca = PCA(n_components=850)
+    #pca.fit(y_vectorize.drop('document_id', axis=1))
+    #y_to_cluster = pca.transform(y_vectorize.drop('document_id', axis=1))
+
+
 
     if algo_cluster == 'KMeans':
         y_model_cluster = KMeans(n_clusters=n_clusters, random_state=42)

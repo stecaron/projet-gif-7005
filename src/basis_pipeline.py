@@ -83,8 +83,8 @@ def main(n_clusters , algo_cluster):
     df_searches_clicks_train = df_searches_clicks_train.drop('document_cluster', axis=1)
 
     # Pour accélérer tests À RETIRER
-    df_searches_clicks_train = df_searches_clicks_train[:2000]
-    y_train = y_train[:2000]
+    df_searches_clicks_train = df_searches_clicks_train
+    y_train = y_train
 
     # Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline = pipeline.Pipeline([
@@ -115,7 +115,7 @@ def main(n_clusters , algo_cluster):
         #"KNN": KNeighborsClassifier()
     }
     grille_estimators = {
-        "MLP": {"Classifier__activation": ["relu", "tanh"]},
+        "MLP": {"Classifier__activation": ["relu"]},
         #"KNN": {"Classifier__n_neighbors": [1, 3, 11, 15], "Classifier__weights": ["uniform", "distance"]}
 
     }
@@ -169,7 +169,8 @@ def main(n_clusters , algo_cluster):
             print(grid_search.best_score_)
 
 if __name__ == "__main__":
-    k = [i for i in range(80, 210, 10)]
+    #k = [i for i in range(170, 210, 10)]
+    k = [180]
     algo = 'KMeans'
     for clust in k:
         print('test pour n_cluster = {}'.format(clust))

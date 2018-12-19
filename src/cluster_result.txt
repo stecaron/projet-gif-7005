@@ -1,4 +1,4 @@
-Kmeans
+Kmeans avec tf-idf
 K = 20   0.0796
 K = 30   0.0888
 K = 40   0.0952
