@@ -36,5 +36,18 @@ Les différentes étapes de notre \emph{pipeline} sont donc les suivantes:
 	\item Transformation des variables catégoriques en variables indicatrices
 	\item Imputation des données manquantes
 \end{itemize}
+
+Évaluation des prédictions :
+
+Pour évaluer la performance de notre modèle, Coveo a défini ce qui constitue une bonne prédiction. Chaque document cliqué par un utilisateur après avoir effectué une recherche est considéré comme pertinent. Ce sont donc les cibles que le modèle doit prédire pour une recherche donnée. Une bonne prédiction doit prédire un ensemble d'au plus 5 documents parmi lesquels on doit retrouver au moins 1 document pertinent. Cette condition est formellement donnée par la fonction de perte suivante, qui indique qu'une perte de 1 résulte de l'absence de documents communs entre l'ensemble de 5 documents renvoyé par notre modèle de prédiction, et l'ensemble des documents cliqués pour la recherche en question :
+
+$$
+l(y_i, \widehat{y_i}):=\left\{
+                          \begin{array}{ll]}
+                            i \quad\text{si } y_i \cap \widehat{y_i}=\emptyset; \\
+                            0 \quad\text{autrement}.
+                          \end{array}
+                        \right.
+$$
 	
 
