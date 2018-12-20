@@ -67,7 +67,7 @@ Une fois que nous avons un jeu de données interprétable par un algorithme d'ap
   \item Perceptron multicouche
 \end{itemize}
 
-Pour la méthode le \textit{clustering} de document était utilisée, les modèles étaient entrainés à prédire des \textit{clusters} de documents. Il y avait donc beaucoup moins de classes à prédire. Lorsque le \textit{clustering} n'était pas utilisé, les modèles étaient entrainés à prédire directement le \texttt{document_id} associé à la requête. Une fois que l'algorithme prédisait un \textit{cluster} de document, pour la validation nous utilisions les cinqs documents qui étaient les plus fréquents parmis le \textit{cluster} prédit.
+Pour la méthode le \textit{clustering} de document était utilisée, les modèles étaient entrainés à prédire des \textit{clusters} de documents. Il y avait donc beaucoup moins de classes à prédire. Lorsque le \textit{clustering} n'était pas utilisé, les modèles étaient entrainés à prédire directement le \texttt{document\_id} associé à la requête. Une fois que l'algorithme prédisait un \textit{cluster} de document, pour la validation nous utilisions les cinqs documents qui étaient les plus fréquents parmis le \textit{cluster} prédit.
 
 \break
 Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous avons évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 9, 11, 15, 25 et 50. 
