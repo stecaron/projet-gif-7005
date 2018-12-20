@@ -37,9 +37,9 @@ En ce qui concerne les transformations sur les variables, trois type transformat
 
 Nous avons testés deux scénarios pour la normalisation des textes de recherches. Nous avons intègrer dans notre \textit{pipeline} la normalisation de \textit{Stemmer}, c'est-à-dire de couper les suffixes de chaques mots. Nous avons aussi laissé la possibilité de ne pas faire de normlisation. Pour la vectorisation des textes de recherches, nous avons integré quatres types de vectorisation dans notre \textit{pipeline}. Nous avons utilisé \textit{CountVectorizer} de la librairie Python \textit{sklearn}. Cette vectorisation compte l'occurence des mots dans chaques textes de recherches. Nous avons aussi testé en mettant l'option binaire, qui fait la disctinction entre la présence du mot ou non, au lieu de faire le compte. La méthode \textit{tf-idf} est également testée. Cette méthode ressemble à \textit{CountVectorizer}, mais il y a une pondération qui tient compte de la présence générale du mot dans l'essemble des documents. Le poids, $w_{i,j}$, pour chaque mot  de chaque document est calculé de cette façon :
 
-\begin{center}
+\begin{gather}
   w_{i,j} = tf_{i,j} \times log(\frac{N}{df_i})
-\end{center}
+\end{gather}
 
 Le $tf_{i,j}$ représente le nombre d'occurences du mot \textit{i} dans la phrase \textit{j}, $df_i$ représente le nombre d'occurences du mot \textit{i} dans l'ensemble des phrases et \textit{N} représente le nombre de phrases au total. 
 Finalement, nous avons aussi testé avec \textit{Word2Vec} de la librairie Python \textit{gensim}. ICI SAM
@@ -64,13 +64,13 @@ Pour attaquer de façon claire le problème de l'optimisation des pré-traitemen
 
 Pour évaluer la performance de notre modèle et ainsi choisir la configuration optimale, il faut une mesure de performance. Coveo a défini ce qui constitue une bonne prédiction. Chaque document cliqué par un utilisateur après avoir effectué une recherche est considéré comme pertinent. Ce sont donc les cibles que le modèle doit prédire pour une recherche donnée. Une bonne prédiction doit prédire un ensemble d'au plus 5 documents parmi lesquels on doit retrouver au moins 1 document pertinent. Cette condition est formellement donnée par la fonction de perte suivante, qui indique qu'une perte de 1 résulte de l'absence de documents communs entre l'ensemble de 5 documents renvoyé par notre modèle de prédiction, et l'ensemble des documents cliqués pour la recherche en question :
 
-\begin{center}
+\begin{gather}
 l(y_i, \widehat{y_i}):=\left\{
-                          \begin{array}{ll]}
+                          \begin{array}{ll}
                             1 \quad\text{si } y_i \cap \widehat{y_i}=\emptyset; \\
                             0 \quad\text{autrement}.
                           \end{array}
                         \right.
-\end{center}
+\end{gather}
 
 
