@@ -1,1 +1,8 @@
 Faire du gros blabla sale sur les résultats. Pourquoi notre score n'est pas si élevé que ça, comment on aurait pu améliorer l'efficacité des embeddings. Techniques qui fonctionnent le mieux et avantages/inconvénients des différentes techniques en production (temps d'entraînement, mémoire, etc.)
+
+Sam: Selon moi, voici les points qui devraient être traités majoritairement pour l'analyse:
+	- Discuter du pourquoi notre meilleur modèle est le meilleur (grand nombre de données permet l'entraînement d'un réseau de neurones complexe avec biais faible)
+	- Pourquoi les embeddings n'apportent pas de performances accrues (Pas d'entraînement possible pour un réseau personnalisé à cause qu'on n'a pas assez d'entourage pour nos mots + modèle pré-entraîné de Google ne contient pas le même vocabulaire que nous, jase pas trop de Coveo).
+	- Avantage du réseau de neurones comparativement au k-PPV en production, car on veut un temps d'évaluation très petit, surtout pour un engin de recherche.
+	- Présenter pourquoi le clustering des documents n'améliore pas les résultats (sûrement difficulté à bien regrouper les documents avec seulement les titres qui fait en sorte que les caractéristiques des requêtes sous-jacentes ne sont pas si simliaires et difficiles à recouper pour créer des attributs)
+	
