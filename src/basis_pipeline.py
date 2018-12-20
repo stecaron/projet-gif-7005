@@ -22,7 +22,7 @@ from grid_search_utility import Make_All_Grid_Search_Models
 config = {
         "Merge type": "merge_steph",
 
-        "Create all grid searchs": {"Do it": True,
+        "Create all grid searchs": {"Do it": False,
                                     "Save name": "Full_run"},
 
         "Show me all the grids": {"Do it": True,
@@ -30,7 +30,7 @@ config = {
 
         "Show me the best grid": {"Do it": True,
                                   "Load name": "Full_run"},
-        "Export csv": True
+        "Export csv": False
         }
 
 # Explications :
@@ -68,9 +68,6 @@ def main():
     y_train = obj_labels_encoder.transform(labels_train)
     y_valid = obj_labels_encoder.transform(labels_test)
 
-    # Pour accélérer tests À RETIRER
-    # df_searches_clicks_train = df_searches_clicks_train[:2000]
-    # y_train = y_train[:2000]
 
     # Pipeline de toutes les transformations qu'on fait, en ordre
     transformation_pipeline = pipeline.Pipeline([

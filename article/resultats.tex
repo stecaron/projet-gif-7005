@@ -9,6 +9,8 @@ Commencer par présenter le baseline obtenu si on prédisait toujours les 5 docu
 
 --- Vrai texte ici
 
+--- WILL: on l'a pas deja dit ça?
+
 Dans un premier temps, nous avons commencé par joindre les recherches et les clicks de la manière expliquée dans la section précédente. Voici le nombre d'observations que nous avons pour les ensembles d'entraînement et (E) de validation (V) après ces traitements:
 
 \begin{center}
@@ -24,14 +26,86 @@ Dans un premier temps, nous avons commencé par joindre les recherches et les cl
 
 Afin d'avoir une idée plus claire des performances reliées à nos modèles, nous avons commencé par nous bâtir un modèle \textit{baseline}. Ce modèle consiste simplement à piger au hasard 5 documents, selon les probabilités à priori des docuements dans le jeu de données d'entraînement. Pour ce modele, nous avons obtenu les résultats suivant: XXXXX
 
-La majorité de nos résultats proviennent de la partie modélisation. Au total, nous avons testé XXXX combinaisons de prétraitements et d'hyperparamètres différents. Voici les 3 combinaisons les plus intéressantes selon nous :
+
+
+La majorité de nos résultats proviennent de la partie modélisation. Au total, nous avons testé 272 combinaisons de prétraitements et d'hyperparamètres différents(47 avec un modèle perceptron multicouche et 225 avec un K plus proches voisins), pendant une durée approximative de 20 heures. 
+\break
+
+Voici des tableaux synthèses de ces expérimentations présentant le score moyen en validation selon certains paramètres pour nos deux familles de modèles testés(perceptron multicouche (MLP) et k plus proches voisins (KNN)):
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Performance moyenne}} \\ \hline
+MLP & KNN \\ \hline
+0.246 & 0.131 \\ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Normalisation des requêtes} & MLP & K-NN \\ \hline
+Aucune                     & 0.242                  & 0.130                  \\ \hline
+PorterStemmer              & 0.250                  & 0.132                  \\ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Type de vecteur} & MLP & KNN \\ \hline
+Word2Vec & 0.094 & 0.101 \\ \hline
+Compte & 0.298 & 0.142 \\ \hline
+Compte binaire & 0.302 & 0.142 \\ \hline
+tf-idf & 0.290 & 0.134 \\ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Fréquence minimum} & MLP & KNN \\ \hline
+1 & 0.247 & 0.134 \\ \hline
+2 & 0.245 & 0.129 \\ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Nombre de couches cachées} & MLP \\ \hline
+1 & 0.285 \\ \hline
+2 & 0.239 \\ \hline
+3 & 0.214 \\ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Nombre de voisins} & KNN \\ \hline
+1 & 0.115 \\ \hline
+3 & 0.140 \\ \hline
+8 & 0.140 \\ \hline
+11 & 0.135 \\ \hline
+15 & 0.132 \\ \hline
+25 & 0.130 \\ \hline
+50 & 0.128 \\ \hline
+\end{tabular}
+\end{center}
+
+\textbf{TODO}: PRÉSENTER DES RÉSULSTATS DE CLUSTERING
+
+Voici les 2 combinaisons les plus performantes pour chacun des modèles :
 
 \begin{itemize}
-  \item Modele 1
-  \item Modele 2
-  \item Modele 3
+  \item \textbf{Modele MLP} (score valide: \textbf{0.360}): Une couche cachée de 100 neurones avec une normalisation des requête et vecteur de compte traditionnel qui considère tous les termes de requête étant présent au moins une fois.
+  \item \textbf{Modele KNN} (score valide: \textbf{0.166}): 15 voisins sont considérés et des poids basés sur la distance avec une normalisation des requête et vecteur de compte binaire qui considère tous les termes de requête étant présent au moins une fois.
 \end{itemize}
 
-[Parlez du temps d'entrainement de ces combinaisons de modeles aussi peut-etre?]
+
 
 
