@@ -56,7 +56,11 @@ Cette méthode permet d'attribuer un poids à chaque mot de la requête en fonct
 Finalement, nous avons aussi testé la vectorisation de nos requêtes selon \textit{Word2Vec} de la librairie Python \textit{gensim}.
 Avec ce modèle, les mots sont projetés dans un espace vectoriel qui permet de capter les similarités entre des mots partageant un entourage semblable. En effet, l'entraînement du modèle de plongement de mots se fait en prédisant l'entourage d'un mot donné à partir de sa représentation vectorielle. On peut ainsi obtenir de bons résultats en généralisation puisqu'on peut plus facilement construire des classifieurs basés sur la représentation vectorielle et qui s'applique à plusieurs mots contrairement à l'utilisation d'une matrice de compte qui n'applique un coefficient qu'à un seul mot.
 
+<<<<<<< HEAD
 Nous avons aussi faite une version de notre code où l'on faisait du prétraitement sur les titres des documents. Nous avons fait du \textit{clustering} avec les titres de documents pour prédire des groupes de documents au lieu de prédire des documents uniques. Pour ce faire, nous avons retiré les mots outils des titres de documents. Par la suite, nous avons fait deux combinaisons de prétraitements. Pour la première, nous avons utilisé l'objet \textit{PorterStemmer} et par la suite nous avons vectorisé les titres des documents à l'aide de la méthode \textit{tf-idf}. La deuxième combinaison était de seulement utiliser \textit{Word2Vec} avec le modèle pré-entrainé de google disponible sur le \href{https://code.google.com/archive/p/word2vec/}{Web}. Une fois que nous avions les attributs des documents, il était possible de faire du \textit{clustering} en utilisant l'objet \textit{KMeans} de la librairie Python \textit{sklearn}. 
+=======
+Nous avons aussi fait une version de notre code où l'on faisait du prétraitement sur les titres des documents. Nous avons fait du \textit{clustering} avec les titres de documents pour prédire des groupes de documents au lieu de prédire des documents uniques. Pour ce faire, nous avons utilisée retirer les mots d'arrêts des titres de documents. Par la suite, nous avons faite deux combinaisons de prétraitement. Nous avons utilisé l'objet \textit{PorterStemmer} et par la suite nous avons vectorisé les titres des dcouments à l'aide de la méthode \textit{tf-idf}. La deuxième combinaison était de seulement utiliser \textit{Word2Vec} avec le modèle pré-entrainé de google disponible sur le \href{https://code.google.com/archive/p/word2vec/}{Web}. Une fois que nous avions les attributs des documents, il était possible de faire du \textit{clustering} en utilisant l'objet \textit{KMeans} de la librairie Python \textit{sklearn}. 
+>>>>>>> origin/master
 
 \subsection{Modélisation}
 
@@ -67,8 +71,13 @@ Une fois que nous avons un jeu de données interprétable par un algorithme d'ap
   \item Perceptron multicouche
 \end{itemize}
 
+<<<<<<< HEAD
 Pour chaque méthode, le \textit{clustering} de documents a été testé. Les modèles étaient alors entrainés à prédire des \textit{clusters} de documents. Il y avait donc beaucoup moins de classes à prédire. Lorsque le \textit{clustering} n'était pas utilisé, les modèles étaient entrainés à prédire directement le document\_id associé à la requête. Pour la validation, une fois que l'algorithme prédisait un \textit{cluster} de documents, nous utilisions les 5 documents qui étaient les plus fréquents à l'intérieur du \textit{cluster} de document prédits comme étant nos 5 documents retournés.
+=======
+Pour la méthode le \textit{clustering} de document était utilisée, les modèles étaient entrainés à prédire des \textit{clusters} de documents. Il y avait donc beaucoup moins de classes à prédire. Lorsque le \textit{clustering} n'était pas utilisé, les modèles étaient entrainés à prédire directement le \texttt{document\_id} associé à la requête. Une fois que l'algorithme prédisait un \textit{cluster} de document, pour la validation nous utilisions les cinqs documents qui étaient les plus fréquents parmis le \textit{cluster} prédit.
+>>>>>>> origin/master
 
+\break
 Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous avons évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 9, 11, 15, 25 et 50. 
 Nous avons également testé différentes fonctions de poids: \texttt{uniform} et \texttt{distance}.
 
