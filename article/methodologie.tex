@@ -1,5 +1,6 @@
 
-Avant même de créer les attributs, il était nécessaire de faire la jonction entre les différents jeux de données pour entres autres indiquer au modèle quelle requête a menée à quel document. D'abord, voici les différents jeux de données (avec le nombre d'observations) à notre disposition:
+Avant même de créer les attributs, il était nécessaire de faire la jonction entre les différents jeux de données entres autres pour indiquer au modèle quelle requête a mené à quel document. 
+D'abord, voici les différents jeux de données (avec le nombre d'observations) à notre disposition:
 
 \begin{center}
   \begin{tabular}{ |c|c|c|c| } 
@@ -14,7 +15,16 @@ Avant même de créer les attributs, il était nécessaire de faire la jonction 
   \end{tabular}
 \end{center}
 
-La colonne E correspond à l'ensemble d'entraînement, la colonne V à l'ensemble de validation et la colonne T correspond à l'emsemble test. Pour ce dernier, nous avions accès aux recherches seulement et non au clicks. Comme on peut le voir, il y a plus de recherches que de clicks. Cela veut dire que certaines recherches ont mené vers aucun click. Une même recherche peut également avoir menée à plusieurs clicks. En bref, il existe plusieurs façons de joindre ces recherches avec ces clicks. Afin de nous simplifier la vie, nous avons retiré les recherches qui n'ont pas mené vers un click. De plus, nous avons également garder seulement le dernier click, en se basant sur le moment du click, pour une même recherche. Notre raisonnement derrière est que le dernier click est probablement le "bon" et que les précédents ajoutent du bruit au modèle. En somme, voici le nombre d'observations que nous avons pour les ensembles d'entraînement et de validation après ces traitements:
+La colonne E correspond à l'ensemble d'entraînement, la colonne V à l'ensemble de validation et la colonne T correspond à l'ensemble de test. 
+Pour ce dernier, nous avions accès aux recherches seulement et non au clicks. 
+Comme on peut le voir, il y a plus de recherches que de clicks. 
+Cela veut dire que certaines recherches n'ont mené à aucun click. 
+Une même recherche peut également avoir mené à plusieurs clicks. 
+En bref, il existe plusieurs façons de joindre ces recherches avec ces clicks. 
+Puisqu'elles n'avaient pas de pouvoir prédictif, nous avons retiré les recherches qui n'ont pas mené vers un click. 
+De plus, nous avons garder seulement le dernier click, en se basant sur le moment du click, pour une même recherche. 
+Notre raisonnement derrière ce traitement est que le dernier click est probablement le "bon" et que les précédents ajoutent du bruit au modèle, car ils ne sont pas vraiment des documents d'intérêt. 
+En somme, voici le nombre d'observations que nous avons pour les ensembles d'entraînement et de validation après ces traitements:
 
 \begin{center}
   \begin{tabular}{ |c|c|c|c| } 
@@ -29,14 +39,27 @@ La colonne E correspond à l'ensemble d'entraînement, la colonne V à l'ensembl
 
 \subsection{Prétaitements des données}
 
-Maintenant que nous avons des observations avec des variables explicatives et des étiquettes, la prochaine étape consiste à effectuer certains prétraitements sur ce jeu de données. Nous avons fait plusieurs combinaisons de pré-traitements de données. Premièrement, nous avons sélectionner les variables que nous voulions inclure dans notre modèle prédictif, c'est à dire : \texttt{querry\_expression}, \texttt{search \_nresults}, \texttt{user\_country} et \texttt{user\_language}.
+Maintenant que nous avons des observations avec des variables explicatives et des étiquettes, la prochaine étape consiste à effectuer certains prétraitements sur ce jeu de données. Nous avons fait plusieurs combinaisons de pré-traitements de données. Premièrement, nous avons sélectionné les variables que nous voulions inclure dans notre modèle prédictif, c'est à dire : \texttt{query\_expression}, \texttt{search\_nresults}, \texttt{user\_country} et \texttt{user\_language}.
 
-Une imputation sur les données manquantes a aussi été effectué. Lorsqu'une données était manquantes, nous avons pris la valeur moyenne de cette variable pour en faire l'imputation.
+Une imputation sur les données manquantes a aussi été effectuée. Lorsqu'une donnée était manquante, nous avons pris la valeur moyenne de cette variable pour en faire l'imputation.
 
-En ce qui concerne les transformations sur les variables, trois type transformations ont été effectué. Premièrement, une transformation des variables catégorielles vers des valeurs numériques. Deuxièmement, une normalisation de la variable \texttt{querry\_expression} est effectuée. Finalement, cette même variable est vectorisée dans le but d'être traiter par notre modèle prédictif.
+En ce qui concerne les transformations sur les variables, trois types de transformation ont été effectués.
+Les trois trois transformations qui ont été faites sont une transformation des variables catégorielles en valeurs numériques, une normalisation des données textuelles et une vectorisation des données textuelles pour obtenir des résultats numériques utilisables par les modèles d'appentissage automatique.
 
-Nous avons testés deux scénarios pour la normalisation des textes de recherches. Nous avons intègrer dans notre \textit{pipeline} la normalisation de \textit{Stemmer}, c'est-à-dire de couper les suffixes de chaques mots. Nous avons aussi laissé la possibilité de ne pas faire de normlisation. Pour la vectorisation des textes de recherches, nous avons integré quatres types de vectorisation dans notre \textit{pipeline}. Nous avons utilisé \textit{CountVectorizer} de la librairie Python \textit{sklearn}. Cette vectorisation compte l'occurence des mots dans chaques textes de recherches. Nous avons aussi testé en mettant l'option binaire, qui fait la disctinction entre la présence du mot ou non, au lieu de faire le compte. La méthode \textit{tf-idf} est également testée. Cette méthode ressemble à \textit{CountVectorizer}, mais il y a une pondération qui tient compte de la présence générale du mot dans l'essemble des documents. Le poids, $w_{i,j}$, pour chaque mot  de chaque document est calculé de cette façon :
+Pour la transformation des variables catégorielles, nous avons simplement créé une variable indicatrice pour chaque modalité de la variable catégorielle.
 
+<<<<<<< Updated upstream
+=======
+Pour ce qui est de la normalisation des données textuelles, ous avons testé deux scénarios.
+Dans le premier cas, nous gardons la donnée textuelle telle qu'elle en ne faisant aucune normalisation.
+Dans le deuxième cas, on utilise l'objet \emph{PorterStemmer} de la librairie Python \emph{NLTK} pour faire du stemming sur nos requêtes.
+Cette technique consiste à faire une série de traitements automtiques qui retirent les affixes des mots de la requête pour conserver leur racine. 
+Cela permet de regrouper les différentes conjugaisons d'un mot ensemble.
+
+Pour la vectorisation des textes de recherche, nous avons integré quatres types de vectorisation dans notre \textit{pipeline}. 
+Nous avons utilisé \textit{CountVectorizer} de la librairie Python \textit{sklearn}. Cette vectorisation compte l'occurence des mots dans chaques textes de recherches. Nous avons aussi testé en mettant l'option binaire, qui fait la disctinction entre la présence du mot ou non, au lieu de faire le compte. La méthode \textit{tf-idf} est également testée. Cette méthode ressemble à \textit{CountVectorizer}, mais il y a une pondération qui tient compte de la présence générale du mot dans l'essemble des documents. Le poids, $w_{i,j}$, pour chaque mot  de chaque document est calculé de cette façon :
+
+>>>>>>> Stashed changes
 \begin{gather}
   w_{i,j} = tf_{i,j} \times log(\frac{N}{df_i})
 \end{gather}
@@ -47,14 +70,15 @@ Finalement, nous avons aussi testé avec \textit{Word2Vec} de la librairie Pytho
 
 \subsection{Modélisation}
 
-Une fois que nous avons un jeu de données interprétable par un algorithme d'apprentissage supervisé, la prochaine étape consiste à tester différents type d'algorithme et aussi différentes combinaisons d'hyperparamètres. Voici les différents algorithmes que nous avons testé:
+Une fois que nous avons un jeu de données interprétable par un algorithme d'apprentissage supervisé, la prochaine étape consiste à tester différents types d'algorithmes et aussi différentes combinaisons d'hyperparamètres. Voici les différents algorithmes que nous avons testé:
 
 \begin{itemize}
   \item Classifieur \textit{k}-PPV
   \item Perceptron multicouche
 \end{itemize}
 
-Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 8, 11, 15, 25 et 50. Ensuite, nous avons également testé différentes fonction de poids: \texttt{uniform} et \texttt{distance}.
+Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 8, 11, 15, 25 et 50. 
+Nous avons également testé différentes fonction de poids: \texttt{uniform} et \texttt{distance}.
 
 Pour le perceptron multicouche, nous avons seulement testé la fonction d'activation \textit{ReLu}. Cependant, nous avons testé plusieurs topographies de réseaux: 1 couche cachée avec 100 neurones, 2 couches cachées avec 100 neurones chacune et 3 couches cachées avec également 100 neurones par couche.
 \break
