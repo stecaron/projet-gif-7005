@@ -23,19 +23,7 @@ Une même recherche peut également avoir mené à plusieurs clicks.
 En bref, il existe plusieurs façons de joindre ces recherches avec ces clicks. 
 Puisqu'elles n'avaient pas de pouvoir prédictif, nous avons retiré les recherches qui n'ont pas mené vers un click. 
 De plus, nous avons garder seulement le dernier click, en se basant sur le moment du click, pour une même recherche. 
-Notre raisonnement derrière ce traitement est que le dernier click est probablement le "bon" et que les précédents ajoutent du bruit au modèle, car ils ne sont pas vraiment des documents d'intérêt. 
-En somme, voici le nombre d'observations que nous avons pour les ensembles d'entraînement et de validation après ces traitements:
-
-\begin{center}
-  \begin{tabular}{ |c|c|c|c| } 
-     \hline
-     Type & E & V \\
-     \hline
-     \hline
-     \textit{searches/clicks} & 18571 & 6920 \\ 
-     \hline
-  \end{tabular}
-\end{center}
+Notre raisonnement derrière ce traitement est que le dernier click est probablement le "bon" et que les précédents ajoutent du bruit au modèle, car ils ne sont pas vraiment des documents d'intérêt.
 
 \subsection{Prétaitements des données}
 
