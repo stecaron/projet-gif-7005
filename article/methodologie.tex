@@ -43,47 +43,45 @@ Maintenant que nous avons des observations avec des variables explicatives et de
 
 Une imputation sur les données manquantes a aussi été effectuée. Lorsqu'une donnée était manquante, nous avons pris la valeur moyenne de cette variable pour en faire l'imputation.
 
+Pour attaquer de façon claire le problème de l'optimisation des pré-traitements et de la sélection des hyperparamètres, nous avons utilisé le module \emph{pipeline} de la librairie Python \emph{sklearn}. Ce dernier nous permet de définir nos différentes étapes de pré-traitement par des classes dont les paramètres sont modifiables. En procédant ainsi, on peut faire une recherche en grille non seulement sur les hyperparamètres de nos modèles, mais aussi sur les différentes prétraitements possibles.
+\break
+
 En ce qui concerne les transformations sur les variables, trois types de transformation ont été effectués.
 Les trois trois transformations qui ont été faites sont une transformation des variables catégorielles en valeurs numériques, une normalisation des données textuelles et une vectorisation des données textuelles pour obtenir des résultats numériques utilisables par les modèles d'appentissage automatique.
 
 Pour la transformation des variables catégorielles, nous avons simplement créé une variable indicatrice pour chaque modalité de la variable catégorielle.
 
-<<<<<<< Updated upstream
-=======
-Pour ce qui est de la normalisation des données textuelles, ous avons testé deux scénarios.
+Pour ce qui est de la normalisation des données textuelles, nous avons testé deux scénarios.
 Dans le premier cas, nous gardons la donnée textuelle telle qu'elle en ne faisant aucune normalisation.
 Dans le deuxième cas, on utilise l'objet \emph{PorterStemmer} de la librairie Python \emph{NLTK} pour faire du stemming sur nos requêtes.
 Cette technique consiste à faire une série de traitements automtiques qui retirent les affixes des mots de la requête pour conserver leur racine. 
-Cela permet de regrouper les différentes conjugaisons d'un mot ensemble.
+Cela permet de regrouper les différentes conjugaisons d'un mot.
 
-Pour la vectorisation des textes de recherche, nous avons integré quatres types de vectorisation dans notre \textit{pipeline}. 
-Nous avons utilisé \textit{CountVectorizer} de la librairie Python \textit{sklearn}. Cette vectorisation compte l'occurence des mots dans chaques textes de recherches. Nous avons aussi testé en mettant l'option binaire, qui fait la disctinction entre la présence du mot ou non, au lieu de faire le compte. La méthode \textit{tf-idf} est également testée. Cette méthode ressemble à \textit{CountVectorizer}, mais il y a une pondération qui tient compte de la présence générale du mot dans l'essemble des documents. Le poids, $w_{i,j}$, pour chaque mot  de chaque document est calculé de cette façon :
+Pour la vectorisation des textes de recherche, nous avons integré quatres types de vectorisation dans notre \textit{pipeline}.
+Pour les deux premières méthodes, nous avons utilisé l'objet \textit{CountVectorizer} de la librairie Python \textit{sklearn}. 
+Nous avons premièrement utilisé cet objet pour créer une matrice d'occurences de chacun des mots pour toutes nos requêtes.
+Ensuite, avec le même objet, nous avons testé la création d'une matrice de présence de chacun des mots (semblable, mais en n'ayant que des résultats binaires).
 
->>>>>>> Stashed changes
-\begin{gather}
-  w_{i,j} = tf_{i,j} \times log(\frac{N}{df_i})
-\end{gather}
+Par la suite, nous avons testé la méthode \textit{tf-idf}. 
+Cette méthode permet d'attribuer un poids à chaque mot de la requête en fonction de sa présence dans la requête, mais aussi de sa présence dans les autres requêtes. Un mot présent dans tous les documents aura donc un poids moins élevé qu'un mot présent seulement dans quelques requêtes, mais à une grande fréquence. On peut ainsi mieux quantifier le pouvoir discriminant des mots de la requête.
 
-Le $tf_{i,j}$ représente le nombre d'occurences du mot \textit{i} dans la phrase \textit{j}, $df_i$ représente le nombre d'occurences du mot \textit{i} dans l'ensemble des phrases et \textit{N} représente le nombre de phrases au total. 
-Finalement, nous avons aussi testé avec \textit{Word2Vec} de la librairie Python \textit{gensim}. ICI SAM
+Finalement, nous avons aussi testé la vectorisation de nos requêtes selon \textit{Word2Vec} de la librairie Python \textit{gensim}.
+Avec ce modèle, les mots sont projetés dans un espace vectoriel qui permet de capter les similarités entre des mots partageant un entourage semblable. En effet, l'entraînement du modèle de plongement de mots se fait en prédisant l'entourage d'un mot donné à partir de sa représentation vectorielle. On peut ainsi obtenir de bons résultats en généralisation puisqu'on peut plus facilement construire des classifieurs basés sur la représentation vectorielle et qui s'applique à plusieurs mots contrairement à l'utilisation d'une matrice de compte par exemple. Afin d'éviter d'entraîner ce réseau et puisque l'entourage des mots est très limité dans des requêtes d'engin de recherche, nous avons utilisée le modèle pré-entraîné de \emph{Google} disponible sur le \href{https://code.google.com/archive/p/word2vec/}{Web}.
 
 
 \subsection{Modélisation}
 
-Une fois que nous avons un jeu de données interprétable par un algorithme d'apprentissage supervisé, la prochaine étape consiste à tester différents types d'algorithmes et aussi différentes combinaisons d'hyperparamètres. Voici les différents algorithmes que nous avons testé:
+Une fois que nous avons un jeu de données interprétable par un algorithme d'apprentissage supervisé, la prochaine étape consiste à tester différents types d'algorithmes et aussi différentes combinaisons d'hyperparamètres. Voici les différents algorithmes que nous avons testés:
 
 \begin{itemize}
   \item Classifieur \textit{k}-PPV
   \item Perceptron multicouche
 \end{itemize}
 
-Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 8, 11, 15, 25 et 50. 
-Nous avons également testé différentes fonction de poids: \texttt{uniform} et \texttt{distance}.
+Pour le classifieur \textit{k}-PPV nous avons considéré deux hyperparamètres différents. En premier lieu, nous avons évidemment testé plusieurs valeurs pour le nombre de voisins (\textit{k}). Nous avons testé les valeurs suivantes: 1, 3, 9, 11, 15, 25 et 50. 
+Nous avons également testé différentes fonctions de poids: \texttt{uniform} et \texttt{distance}.
 
 Pour le perceptron multicouche, nous avons seulement testé la fonction d'activation \textit{ReLu}. Cependant, nous avons testé plusieurs topographies de réseaux: 1 couche cachée avec 100 neurones, 2 couches cachées avec 100 neurones chacune et 3 couches cachées avec également 100 neurones par couche.
-\break
-
-Pour attaquer de façon claire le problème de l'optimisation des pré-traitements et de la sélection des hyperparamètres, nous avons utilisé le module \emph{pipeline} de la librairie Python \emph{sklearn}. Ce dernier nous permet de définir nos différentes étapes de pré-traitement par des classes dont les paramètres sont modifiables. En procédant ainsi, on peut faire une recherche en grille non seulement sur les hyperparamètres de nos modèles, mais aussi sur les différentes prétraitements possibles.
 \break
 
 Pour évaluer la performance de notre modèle et ainsi choisir la configuration optimale, il faut une mesure de performance. Coveo a défini ce qui constitue une bonne prédiction. Chaque document cliqué par un utilisateur après avoir effectué une recherche est considéré comme pertinent. Ce sont donc les cibles que le modèle doit prédire pour une recherche donnée. Une bonne prédiction doit prédire un ensemble d'au plus 5 documents parmi lesquels on doit retrouver au moins 1 document pertinent. Cette condition est formellement donnée par la fonction de perte suivante, qui indique qu'une perte de 1 résulte de l'absence de documents communs entre l'ensemble de 5 documents renvoyé par notre modèle de prédiction, et l'ensemble des documents cliqués pour la recherche en question :
