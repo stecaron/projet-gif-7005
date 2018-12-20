@@ -24,11 +24,11 @@ Dans un premier temps, nous avons commencé par joindre les recherches et les cl
   \end{tabular}
 \end{center}
 
-Afin d'avoir une idée plus claire des performances reliées à nos modèles, nous avons commencé par nous bâtir un modèle \textit{baseline}. Ce modèle consiste simplement à piger au hasard 5 documents, selon les probabilités à priori des docuements dans le jeu de données d'entraînement. Pour ce modele, nous avons obtenu les résultats suivant: XXXXX
+Afin d'avoir une idée plus claire des performances reliées à nos modèles, nous avons commencé par nous bâtir un modèle \textit{baseline}. Ce modèle consiste simplement à assigner les 5 documents les plus fréquents, selon les documents dans le jeu de données d'entraînement. Pour ce modèle, nous avons obtenu un score de 0.0359.
+\break
 
 
-
-La majorité de nos résultats proviennent de la partie modélisation. Au total, nous avons testé 272 combinaisons de prétraitements et d'hyperparamètres différents(47 avec un modèle perceptron multicouche et 225 avec un K plus proches voisins), pendant une durée approximative de 20 heures. 
+Pour choisir notre modèle, nous avons testé 272 combinaisons de prétraitements et d'hyperparamètres différents(47 avec un modèle perceptron multicouche et 225 avec un K plus proches voisins), pendant une durée approximative de 20 heures. 
 \break
 
 Voici des tableaux synthèses de ces expérimentations présentant le score moyen en validation selon certains paramètres pour nos deux familles de modèles testés(perceptron multicouche (MLP) et k plus proches voisins (KNN)):
