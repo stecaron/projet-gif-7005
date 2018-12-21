@@ -1,21 +1,21 @@
-Faire du gros blabla sale sur les résultats. Pourquoi notre score n'est pas si élevé que ça, comment on aurait pu améliorer l'efficacité des embeddings. Techniques qui fonctionnent le mieux et avantages/inconvénients des différentes techniques en production (temps d'entraînement, mémoire, etc.)
-
-Sam: Selon moi, voici les points qui devraient être traités majoritairement pour l'analyse:
-	- Discuter du pourquoi notre meilleur modèle est le meilleur (grand nombre de données permet l'entraînement d'un réseau de neurones complexe avec biais faible)
-	- Pourquoi les embeddings n'apportent pas de performances accrues (Pas d'entraînement possible pour un réseau personnalisé à cause qu'on n'a pas assez d'entourage pour nos mots + modèle pré-entraîné de Google ne contient pas le même vocabulaire que nous, jase pas trop de Coveo).
-	- Avantage du réseau de neurones comparativement au k-PPV en production, car on veut un temps d'évaluation très petit, surtout pour un engin de recherche.
-	- Présenter pourquoi le clustering des documents n'améliore pas les résultats (sûrement difficulté à bien regrouper les documents avec seulement les titres qui fait en sorte que les caractéristiques des requêtes sous-jacentes ne sont pas si simliaires et difficiles à recouper pour créer des attributs)
+Les résultats montrent que le meilleur score pour le modèle MLP est plus de deux fois supérieur que le meilleur score pour le modèle KNN (0.360 vs 0.166). 
+Ceci montre que la problématique de recommandation de documents est probablement trop complexe pour être modélisée par un algorithme basé sur le voisinage comme le KNN. 
+Les deux méthodes fonctionnent bien avec un grand nombre de données et ont généralement un biais faible. 
+Dans le cas du MLP, ce grand nombre de données a probablement permis l'entraînement d'un nombre important de neurones, ce qui est directement lié avec la capacité de notre classifieur à mieux modéliser le phénomène complexe de recommandation de documents. 
+Par rapport à la problématique, le modèle KNN présente aussi un désavantage si on le compare au MLP en terme de temps d'évaluation lors de la présentation d'une nouvelle donnée. KNN doit stocker et utiliser les données pour déterminer le voisinage d'une nouvelle donnée en entrée. 
+Cela peut représenter un obstable avec le nombre important de données utilisées pour bâtir le modèle, ce qui n'est pas souhaitable pour un engin de recherche qui doit idéalement donner une réponse rapidement pour satisfaire les exigences techniques d'un tel outil. 
+En revanche, le MLP permet de ne conserver que les paramètres du modèle et permet ainsi un temps d'évaluation nettement réduit.
 \break
 
-Début du vrai texte :
+Lorsque le \textit{clustering} de documents était utilisé pour se créer des étiquettes de données, les modèles étaient moins performants. 
+Nous croyons qu'avec seulement le titre des documents, nous n'avions pas assez d'information pour faire des clusters significativement différents. 
+De plus, une fois que le cluster était prédit, ce n'était peut-être pas optimal de simplement proposé les 5 documents les plus fréquents. 
+Il est donc préférable de laisser les algorithmes apprendre directement les documents à prédire plutôt que des groupes de ceux-ci si on utilise une approche trop simpliste comme nous avons fait.
 \break
 
-Les résultats montrent que le meilleur score pour le modèle MLP est plus de deux fois supérieur qu'avec le meilleur score pour le modèle KNN (0.360 vs 0.166). Ceci montre que la problématique de recommandation de documents est probablement trop complexe pour être modélisée par un algorithme basé sur le voisinage comme le KNN. Les deux méthodes fonctionnent  bien avec un grand nombre de données et ont généralement un biais faible. Dans le cas du MLP, ce grand nombre de données a probablement permis l'entraînement d'un nombre important de neurones, ce qui est directement lié avec la capacité de notre classifieur à mieux modéliser le phénomène complexe de recommandation de documents. Par rapport à la problématique, le modèle KNN présente aussi un désavantage si on le compare au MLP en termes de temps d'évaluation lors de la présentation d'une nouvelle donnée. KNN doit stocker et utiliser les données pour déterminer le voisinage d'une nouvelle donnée en entrée. Cela peut représenter un obstable avec le nombre important de données utilisées pour bâtir le modèle, ce qui n'est pas souhaitable pour un engin de recherche qui doit idéalement donner une réponse rapidement pour satisfaire les exigence ergonomique d'un tel outil. En revanche, seul le modèle est conservé avecle MLP, pas les données, ce qui allège le calcul et donc le temps de réponse.
-\break
-
-Lorsque le \textit{clustering} de documents étaient utilisé pour se créer des étiquettes de données, les modèle étaient moins performant. Nous croyons qu'avec seulement le titre des documents, nous n'avions pas assez d'information pour faire des clusters significativement différents. De plus, une fois que le cluster était prédit, ce n'était peut-être pas optimal de simplement proposé les 5 documents les plus fréquents. Il est donc préférable de laisser les algorithmes apprendrent directement les documents à prédire plutôt que des groupes de ceux-ci.
-\break
-
-Maintenant, au-delà de la comparaison des deux algorithmes testés, il reste tout de même qu'un score final de 0.36 n'est pas une performance très bonne. Plusieurs raisons peuvent être derrière ce faible taux de classement. D'une part, le contenu des documents était une donnée qu'on ne pouvait utiliser pour bâtir notre modèle puisque non présente. Or, comme présenté au début de cet article, la littérature montre que c'est principalement sur cette information que se basent les techniques actuelles. L'extraction d'information pertinente pour la présente problématique devait donc principalement être le texte des recherches. Ce type de texte est pour sa part beaucoup plus bruité que ce que l'on peut retrouver dans le contenu d'un document, ce qui permet mal de bien caractériser les recherches.
-
-	
+Maintenant, au-delà de la comparaison des deux algorithmes testés, il reste tout de même qu'un score final de 0.36 n'est pas une performance très bonne.
+Plusieurs raisons peuvent être derrière ce faible taux de classement. 
+D'une part, le contenu des documents était une donnée qu'on ne pouvait utiliser pour bâtir notre modèle puisque non présente.
+Or, comme présenté au début de cet article, la littérature montre que c'est principalement sur cette information que se basent les techniques actuelles en recommandation de documents. 
+L'extraction d'information pertinente pour la présente problématique a donc dû être faite principalement sur le texte des recherches. 
+Ce type de texte est pour sa part beaucoup plus bruité (plus de mots inconnus/ne faisant pas partie de la langue usuelle) que le texte de documents ce qui rend plus difficile l'utilisation de modèles standards pré-entraînés.

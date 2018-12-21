@@ -1,16 +1,3 @@
-Présentation des résultats avec tableaux, figures et tests statistiques.
-On n'analyse rien ici, on ne fait que montrer ce que nous avons obtenue avec l'approche décrite plus haut.
-
-Sam: Dans cette section, j'irais très simple et droit au but dans le style, pour telle étape, voici nos top 5 modèles et ça nous a pris Xh à rouler le tout.
-Au total on a fait 9999 combinaisons de modèles/pré-traitements.
-On laisse la section blabla pour l'analyse des résultats.
-
-Commencer par présenter le baseline obtenu si on prédisait toujours les 5 documents les plus fréquents.
-
---- Vrai texte ici
-
---- WILL: on l'a pas deja dit ça?
-
 Dans un premier temps, nous avons commencé par joindre les recherches et les clicks de la manière expliquée dans la section précédente. Voici le nombre d'observations que nous avons pour les ensembles d'entraînement et (E) de validation (V) après ces traitements:
 
 \begin{center}
@@ -28,7 +15,7 @@ Afin d'avoir une idée plus claire des performances reliées à nos modèles, no
 \break
 
 
-Pour choisir notre modèle, nous avons testé 272 combinaisons de prétraitements et d'hyperparamètres différents(47 avec un modèle perceptron multicouche et 225 avec un K plus proches voisins), pendant une durée approximative de 20 heures. 
+Pour choisir notre modèle, nous avons testé 272 combinaisons de prétraitements et d'hyperparamètres différents (47 avec un modèle perceptron multicouche et 225 avec un K plus proches voisins), pendant une durée approximative de 20 heures. 
 \break
 
 Voici des tableaux synthèses de ces expérimentations présentant le score moyen en validation selon certains paramètres pour nos deux familles de modèles testés(perceptron multicouche (MLP) et k plus proches voisins (KNN)):
@@ -97,15 +84,13 @@ tf-idf & 0.290 & 0.134 \\ \hline
 \end{tabular}
 \end{center}
 
-\textbf{TODO}: PRÉSENTER DES RÉSULSTATS DE CLUSTERING
-
-Pour ce qui est du modèle avec le \textit{clustering} des titres de documents, nous nous sommes aperçus, après quelques tests, que le modèle était beaucoup moins performant que le modèle sans \textit{clustering}. Nous avions des résultats aux alentours de 0.21 avec 180 \textit{clusters}. Nous n'avons donc pas pousser plus loins notre analyse.
+Pour ce qui est du modèle avec le \textit{clustering} des titres de documents, nous nous sommes aperçus, après quelques tests, que le modèle était beaucoup moins performant que le modèle sans \textit{clustering}. Nous avions des résultats aux alentours de 0.21 avec 180 \textit{clusters}. Nous n'avons donc pas pousser plus loin notre analyse.
 
 Voici les 2 combinaisons les plus performantes pour chacun des modèles :
 
 \begin{itemize}
-  \item \textbf{Modele MLP} (score valide: \textbf{0.360}): Une couche cachée de 100 neurones avec une normalisation des requête et vecteur de compte traditionnel qui considère tous les termes de requête étant présent au moins une fois.
-  \item \textbf{Modele KNN} (score valide: \textbf{0.166}): 15 voisins sont considérés et des poids basés sur la distance avec une normalisation des requête et vecteur de compte binaire qui considère tous les termes de requête étant présent au moins une fois.
+  \item \textbf{Modele MLP} (score validation: \textbf{0.360}): Une couche cachée de 100 neurones avec une normalisation des requêtes et vecteur de compte traditionnel qui considère tous les termes de requête étant présents au moins une fois.
+  \item \textbf{Modele KNN} (score validation: \textbf{0.166}): 15 voisins sont considérés et des poids basés sur la distance avec une normalisation des requêtes et vecteur de compte binaire qui considère tous les termes de requête étant présents au moins une fois.
 \end{itemize}
 
 
