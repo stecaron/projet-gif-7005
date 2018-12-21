@@ -13,6 +13,13 @@ De plus, une fois que le cluster était prédit, ce n'était peut-être pas opti
 Il est donc préférable de laisser les algorithmes apprendre directement les documents à prédire plutôt que des groupes de ceux-ci si on utilise une approche trop simpliste comme nous avons fait.
 \break
 
+Également, on remarque que, malgré la grande notoriété des plongements de mots en traitement de la langue naturelle, l'utilisation des \emph{embeddings} de mots ne donne pas de bons résultats dans notre contexte.
+On explique cela par le fait que le vocabulaire de nos requêtes est assez particulier et contient des mots qui ne font pas partie de la langue usuelle.
+Pour cette raison, le modèle de Google que nous avons utilisé ne permet pas bien de capter les ressemblances entre nos requêtes. 
+Il aurait donc fallu procéder à un entraînement du modèle sur nos requêtes pour qu'il s'adapte mieux à notre contexte, mais puisque les plongements de mots sont basés sur l'entourage des mots et que nos requêtes sont très courtes, l'entraînement que nous avons n'a pas du tout amélioré les résultats.
+
+\break
+
 Maintenant, au-delà de la comparaison des deux algorithmes testés, il reste tout de même qu'un score final de 0.36 n'est pas une performance très bonne.
 Plusieurs raisons peuvent être derrière ce faible taux de classement. 
 D'une part, le contenu des documents était une donnée qu'on ne pouvait utiliser pour bâtir notre modèle puisque non présente.
